@@ -95,36 +95,36 @@ void get_road_info_history(RoadInfo  *road_info_arr,LocRoad * loc_road_arr)
 
 
     }
-
 }
-static void get_info_str(char * in_str ,RoadInfo * road_info)
+
+static void get_info_str(char * in_str ,double * speed ,int * weekday, int * hh  ,int * mm)
 {
 
     char *token = strtok(in_str," ");
 
     //将 88_0 转成 880
-    char loc_str[10];
-    int j = 0;
-    for(int i = 0 ; i < (int)strlen(token) ; i ++) {
-        if( isdigit( token[i])  ) {
-            loc_str[j++] = token[i];
-        }
-    }
-    loc_str[j] = '\0';
-
-
-    int road_id = atoi(loc_str);
-    road_info->road_id = road_id;
+//    char loc_str[10];
+//    int j = 0;
+//    for(int i = 0 ; i < (int)strlen(token) ; i ++) {
+//        if( isdigit( token[i])  ) {
+//            loc_str[j++] = token[i];
+//        }
+//    }
+//    loc_str[j] = '\0';
+//
+//
+//    int road_id = atoi(loc_str);
+//    road_info->road_id = road_id;
 
     token = strtok(NULL," ");
-    double speed = strtod(token,NULL);
-    assert(speed > 0.02);
+    (*speed) = strtod(token,NULL);
+
 
     token = strtok(NULL," ");
     int y,m,d;
     sscanf(token,"%d-%d-%d",&y,&m,&d);
 
-
+//    (*now_time).year
 
     token = strtok(NULL," ");
     int h,mi,s;
@@ -138,12 +138,13 @@ static void get_info_str(char * in_str ,RoadInfo * road_info)
     }
 
 
+    (*hh) = h;
+    (*mm) = m;
 
-    int week_t = ZellerFun(y,m,d) ;
-    int all_mi = h * 60 +mi;
+    (*weekday) = ZellerFun(y,m,d) ;
 
-    road_info->history_road[week_t][all_mi/STEP] += speed;
-    road_info->road_times_arr[week_t][all_mi/STEP] ++;
+
+
 
 }
 void get_road_info_history_node(RoadInfo  *road_info ,RoadInfo * pre_road_info ,LocRoad * loc_road_arr)
@@ -214,6 +215,30 @@ void get_road_info_history_node(RoadInfo  *road_info ,RoadInfo * pre_road_info ,
         }
         now_l_head = now_l_head->next;
     }//end while
+
+    //store data
+    FILE * fout = fopen("train","w");
+    for(int i = 0 ; i <= 6 ; i ++){
+        double w ;
+
+
+        for(int k = 0 ; k < train_data[i].size() ; k ++){
+            for(int j = 0 ; j < 4 ; j++){
+                w = (train_data[i][k][j]);
+                fprintf(fout,"%lf " ,w);
+            }
+            if(k +1 == train_data[i].size() ){
+                w = train_data[i][k][0];
+                fprintf(fout ,"%lf", w);
+            }else {
+                w = train_data[i][k+1][0];
+                fprintf(fout ,"%lf", w);
+            }
+            fprintf(fout ,"\n");
+        }
+    }
+    fclose(fout);
+    /////
 
 
     //最后训练的权值 要保存在 loc 里面
@@ -297,6 +322,78 @@ void copy_history_roadinfo_locroado(RoadInfo  *road_info_arr , LocRoad * loc_roa
     }
 
 }
+
+double  prediction_train_loc_road(LocRoad * loc_road_arr ,
+    int weekday ,int h ,int m ,double speed ,int locid ,int pre_time )
+{
+
+    double pre_speed = 0;
+
+    int loc_pos = locid_hash[locid];
+    int pre_locid = loc_road_arr[loc_pos].pre_locid;
+    int pre_loc_pos  = locid_hash[pre_locid];
+    double (*weight)[5] =  &(loc_road_arr[loc_pos].weights_arr[weekday] );
+
+    int t = (h*24 + m)/STEP;
+    double speed_arr[5] ;
+    speed_arr[0]    =1 ;
+    speed_arr[1]    = speed;
+    speed_arr[2]    = loc_road_arr[pre_loc_pos].history_road[weekday][t];
+    speed_arr[3]    = loc_road_arr[pre_loc_pos].history_road[weekday][t+1];
+    speed_arr[4]    = loc_road_arr[loc_pos].history_road[weekday][t+1];
+
+    normalize(speed_arr ,5);
+    for(int i = 0 ; i < 5 ; i ++){
+
+        pre_speed += (*weight)[i] * speed_arr[i];
+    }
+
+    //printf("%lf\n",pre_speed);
+
+    return pre_speed;
+
+}
+//test 检查 梯度下降的准确性
+void check_train_loc_road(LocRoad * loc_road_arr )
+{
+    FILE * fin = fopen("./data/txt/39_0.txt","r");
+
+    char in_str[MAX_STRLEN];
+    struct date_t  now_time;
+    if(fin == NULL) {
+        printf("./data/txt/39_0.txt open error\n");
+        return ;
+    }
+    //读取文件内容
+    double speed;
+    int weekday;
+    int h;
+    int m;
+    double pre_speed = 0;
+
+    int n = 0;
+    int right_num =0;
+    while(fgets(in_str,MAX_STRLEN ,fin)) {
+
+        if(strlen(in_str) <  DATA_LEN-5) continue;
+
+        printf("%lf %lf\n" ,speed ,pre_speed);
+
+        if(fabs (speed - pre_speed) <  5.0 ){
+            right_num ++;
+        }
+        get_info_str(in_str,&speed ,&weekday ,&h,&m);
+
+        pre_speed = prediction_train_loc_road(loc_road_arr ,weekday ,h,m,speed,390,1);
+
+
+        n ++;
+    }
+
+    printf("%lf\n",right_num *1.0 / n);
+
+
+}
 void predict_main()
 {
     NavRoad * nav_road_arr;
@@ -324,6 +421,9 @@ void predict_main()
     copy_history_roadinfo_locroado(road_info_arr ,loc_road_arr );
 
 
+    prediction_train_loc_road( loc_road_arr ,1 ,10 ,10 ,20 ,390 ,2);
+
+    check_train_loc_road(loc_road_arr);
     printf("debug \n");
 
 

@@ -12,7 +12,7 @@
 // 并为
 
 
-const int STEP = 15;
+const int STEP = 4;
 const int TIMES_DAY = 24*60 / STEP;
 
 ////一条道路 一天每个时间的速度

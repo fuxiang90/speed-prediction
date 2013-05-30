@@ -26,6 +26,7 @@ using namespace std;
 
 
 void gaussian(CMat * features_vec) ;
+void normalize(double *arr , int len );
 
 vector <double >  gd_train( vector <vector <double > > & train_data ,vector <double > &labels);
 

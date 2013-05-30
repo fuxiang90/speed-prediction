@@ -8,7 +8,12 @@ static int train_times;
 //准备定死 ,每次重复计算 mean 和 squre 很烦人啊
 const double mean    = 46.8272044935;
 const double square  =13.8657378774;
-
+void normalize(double *arr , int len )
+{
+    for(int i = 1 ; i < len ; i ++){
+        arr[i] = (arr[i] - mean) / (1.5*square) ;
+    }
+}
 
 void gaussian2(CMat * features_vec)
 {
@@ -73,7 +78,9 @@ void gradient_desecent(CMat *  train_feature , vector<double> & train_labels , v
     for(int i = 0 ; i < features_num ; i ++){
         weights_vec[i] = 1;
     }
-    double theta0 = 0.0001 ; //学习速度
+    //double theta0 = 0.000000002 ; //学习速度
+
+    double  theta0 = 0.0002;
 
     std::vector<double > delta(features_num,0.0);
 

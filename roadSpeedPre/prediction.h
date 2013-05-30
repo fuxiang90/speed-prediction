@@ -50,12 +50,18 @@ void get_road_info_history_node(RoadInfo  *road_info ,RoadInfo * pre_road_info, 
 
 void road_info_process(RoadInfo  *road_info_arr );
 
-static void get_info_str(char * in_str ,RoadInfo * road_info);
+static void get_info_str(char * in_str ,double * speed ,int * weekday, int * h  ,int * m);
 // test
 
 //把历史数据 拷贝到 loc 中,
 void copy_history_roadinfo_locroado(RoadInfo  *road_info_arr , LocRoad * loc_road_arr );
-void prediction_train_loc_road(LocRoad * loc_road_arr  );
+
+double prediction_train_loc_road(LocRoad * loc_road_arr ,int weekday ,int h ,int m ,double speed ,int locid ,int pre_time );
+
+//test 检查 梯度下降的准确性
+void check_train_loc_road(LocRoad * loc_road_arr );
+
+
 void predict_main();
 
 #endif // PREDICTION_H_INCLUDED
