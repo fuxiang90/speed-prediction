@@ -19,7 +19,8 @@ int main()
 //    for (int i = 0 ; i <= 100 ; i ++){
 //        testInput();
 //
-    predict_main();
+    road_main();
+//    road_main();
     cout << "Hello world!" << endl;
     return 0;
 }

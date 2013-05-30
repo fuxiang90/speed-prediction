@@ -14,17 +14,23 @@ void nav_road_init(NavRoad * *nav_road_arr , NavRoadKeyNode *  *nav_key_node_arr
 
     (*nav_road_arr) = (NavRoad *)malloc(sizeof(NavRoad)*MAX_ROAD);
 
+
+
     if((*nav_road_arr) == NULL) {
         printf("memory error\n");
         exit(0);
     }
+    memset(*nav_road_arr,0,sizeof(NavRoad)*MAX_ROAD);
 
     (*nav_key_node_arr) = (NavRoadKeyNode *)malloc(sizeof(NavRoadKeyNode)*MAX_KEY_NODE);
+
+
 
     if((*nav_key_node_arr) == NULL) {
         printf("memory error\n");
         exit(0);
     }
+    memset(*nav_key_node_arr , 0, sizeof(NavRoadKeyNode)*MAX_KEY_NODE);
 
     locid_hash = (int *)malloc(sizeof(int) *MAX_LOC_ROAD);
 
@@ -190,19 +196,29 @@ int  nav_bfs(int locid , LocRoad * loc_road_arr  ,NavRoad  *nav_road_arr,NavRoad
 }
 void check_locid_pre( LocRoad * loc_road_arr  ,NavRoad  *nav_road_arr , NavRoadKeyNode *  nav_key_node_arr)
 {
-    for(int i = 1 ; i <= real_loc_road_count ; i++){
+
+    FILE * fin = fopen("loc_pre_loc","w");
+    for(int i = 1 ; i < real_loc_road_count ; i++){
+
+
 
         int locid = loc_road_arr[i].locid ;
-
-        if(locid ==37910 ){
+        //if(locid_hash [locid] == 0 ) continue;
+        if(locid == 390){
             locid ++;
             locid --;
         }
-        int pre_locid = nav_bfs(locid,loc_road_arr ,nav_road_arr ,nav_key_node_arr);
 
-        printf("%d %d \n",locid ,pre_locid);
+        int pre_locid = loc_road_arr[i].pre_locid;
+
+        if(pre_locid ){
+            fprintf(fin,"%d %d \n",locid ,pre_locid);
+            printf("%d %d \n",locid ,pre_locid);
+        }
+
 
     }
+    fclose(fin);
 }
 
 void get_locid_pre( LocRoad * loc_road_arr  ,NavRoad  *nav_road_arr , NavRoadKeyNode *  nav_key_node_arr)
@@ -211,9 +227,15 @@ void get_locid_pre( LocRoad * loc_road_arr  ,NavRoad  *nav_road_arr , NavRoadKey
     for(int i = 1 ; i <= real_loc_road_count ; i++){
 
         int locid = loc_road_arr[i].locid ;
+
+        if(locid == 390){
+            locid ++;
+            locid --;
+        }
+
         int pre_locid = nav_bfs(locid,loc_road_arr ,nav_road_arr ,nav_key_node_arr);
 
-        loc_road_arr[locid].pre_locid = pre_locid;
+        loc_road_arr[i].pre_locid = pre_locid;
     }
 }
 void road_main()
@@ -230,10 +252,11 @@ void road_main()
 
     get_locid_seq(loc_road_arr ,nav_road_arr);
 
+    get_locid_pre(loc_road_arr ,nav_road_arr ,nav_key_node_arr);
 
+    int id = nav_bfs(390,loc_road_arr ,nav_road_arr ,nav_key_node_arr);
 
-//    nav_bfs(3270,loc_road_arr ,nav_road_arr ,nav_key_node_arr);
-
+    printf("%d \n",id);
     check_locid_pre(loc_road_arr ,nav_road_arr ,nav_key_node_arr);
 
 

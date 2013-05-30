@@ -31,7 +31,7 @@ void get_road_info(RoadInfo * road_info_arr)
 
     //get file name 下一次应该写个函数得到某个目录下指定后缀的目录名
 
-    char filename[][20] = { "39_0.txt","40_0.txt"};
+    char filename[][20] = { "39_0.txt","40_0.txt","376_0.txt","386_0.txt","2252_0.txt"};
     //
 
     char *file_name =  (char *)malloc(sizeof(char) * MAX_FILE_NAME_LEN);

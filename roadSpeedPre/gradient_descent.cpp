@@ -80,7 +80,7 @@ void gradient_desecent(CMat *  train_feature , vector<double> & train_labels , v
     }
     //double theta0 = 0.000000002 ; //学习速度
 
-    double  theta0 = 0.0002;
+    double  theta0 = 0.0001;
 
     std::vector<double > delta(features_num,0.0);
 
