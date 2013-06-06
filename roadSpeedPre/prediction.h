@@ -28,6 +28,7 @@
 #include "input.h"
 #include "road.h"
 #include "gradient_descent.h"
+#include "schedule.h"
 
 using namespace std;
 
@@ -40,7 +41,7 @@ RoadInfo * predict_init();
 
 void get_road_info(RoadInfo * road_info_arr);
 
-void get_road_info_filename(RoadInfo * head , char *filename );
+int get_road_info_filename(RoadInfo * head , char *filename );
 
 
 //生成所有的history_road 的数据
@@ -48,20 +49,41 @@ void get_road_info_history(RoadInfo  *road_info_arr);
 
 void get_road_info_history_node(RoadInfo  *road_info ,RoadInfo * pre_road_info, LocRoad * loc_road_arr ) ;
 
+void roado_info_process_one(RoadInfo * head);
+
 void road_info_process(RoadInfo  *road_info_arr );
 
 static void get_info_str(char * in_str ,double * speed ,int * weekday, int * h  ,int * m);
 // test
 
 //把历史数据 拷贝到 loc 中,
-void copy_history_roadinfo_locroado(RoadInfo  *road_info_arr , LocRoad * loc_road_arr );
+void copy_history_roadinfo_locroad(RoadInfo  *road_info_arr , LocRoad * loc_road_arr );
 
-double prediction_train_loc_road(LocRoad * loc_road_arr ,int weekday ,int h ,int m ,double speed ,int locid ,int pre_time );
+int prediction_train_loc_road(double * *speed_arr  ,
+LocRoad * loc_road_arr ,int weekday ,int h ,int m ,double speed ,int locid ,int next_time );
+
+//查询下一个时刻的
+double  prediction_train_loc_road_next(LocRoad * loc_road_arr ,
+    int weekday ,int h ,int m ,double speed ,int locid ,int pre_time );
+
+//查询指定时间之后 的历史数据
+int  history_train_loc_road( double * speed_arr ,
+LocRoad * loc_road_arr ,int weekday ,int h ,int m ,double speed ,int locid ,int next_time );
 
 //test 检查 梯度下降的准确性
 void check_train_loc_road(LocRoad * loc_road_arr );
 
 
+//根据调度信息 分别得到各个道路的训练模型
+void schedule_train_loc_road(int * schedule_arr  ,int n, LocRoad * loc_road_arr ,RoadInfo  *road_info_arr );
+
+//训练单个道路 并把权值放在loc_road_arr 里面
+void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad * loc_road_arr);
+
 void predict_main();
+
+
+// 使用调度算法的预测
+void predict_schedule_main();
 
 #endif // PREDICTION_H_INCLUDED

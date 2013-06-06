@@ -46,5 +46,9 @@ int ZellerFun(int yearnumber ,int monthnumber ,int daynumber);
 /*39_0 将这个样的字符 转化为 数字 390 */
 int get_locid_str(char * str);
 
+void get_filename(int locid ,char str[]);
+
+int get_dir_filenames( char  * * filename_arr ,int max_file_num);
+
 void testFun();
 #endif // FUNCTION_H_INCLUDED

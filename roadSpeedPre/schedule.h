@@ -30,7 +30,7 @@ ScheduleGraph * graph_init();
 
 
 void set_graph_info(ScheduleGraph * graph ,LocRoad * loc_road_arr);
-void graph_topo_sort(int * * schedule_arr  ,int *n , ScheduleGraph * graph ,LocRoad * loc_road_arr );
+void graph_topo_sort(int * * schedule_arr  ,int *n , ScheduleGraph * graph  );
 
 
 

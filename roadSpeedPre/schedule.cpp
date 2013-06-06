@@ -25,7 +25,7 @@ ScheduleGraph * graph_init()
 void set_graph_info(ScheduleGraph * graph ,LocRoad * loc_road_arr)
 {
     for(int i = 1 ; i < MAX_LOC_ROAD ; i++){
-        if(loc_road_arr[i].locid != 0 && loc_road_arr[i].locid  !=  loc_road_arr[i] .pre_locid){
+        if(loc_road_arr[i].locid != 0 ){
             int start = loc_road_arr[i].pre_locid;
 
             int end = loc_road_arr[i].locid;
@@ -38,9 +38,13 @@ void set_graph_info(ScheduleGraph * graph ,LocRoad * loc_road_arr)
                 graph->indegree[end]  = 0;
             if(graph->indegree[start]  == -1)
                 graph->indegree[start]  = 0;
+
+
+
             if(start == end ){
                 continue;
             }
+
             int pos = graph->degree[start];
             graph->edge_arr[start][pos] = end;
             graph->indegree[end] += 1;
@@ -54,6 +58,8 @@ void set_graph_info(ScheduleGraph * graph ,LocRoad * loc_road_arr)
         }
 
     }
+
+
 
 
 }
@@ -88,7 +94,7 @@ void graph_topo_sort(int * * schedule_arr  ,int *n , ScheduleGraph * graph )
         graph->indegree[locid] = -1;
     }
 
-
+    fclose(fin);
 
     ////////////////////////////////////////
     int schedule_arr_pos = 0;
@@ -121,15 +127,30 @@ void graph_topo_sort(int * * schedule_arr  ,int *n , ScheduleGraph * graph )
     }// end while
 
     free(used);
-    for(int i = 0 ; i < schedule_arr_pos  ; i ++){
-        printf("%d \n",(*schedule_arr)[i]);
+
+    //debug
+    FILE * fout = fopen("schedule","w");
+    if(fout == NULL){
+        fprintf(stderr," open error");
+        exit(0);
     }
+
+    for(int i = 0 ; i < schedule_arr_pos  ; i ++){
+        fprintf(fout ,"%d \n",(*schedule_arr)[i]);
+    }
+
+
+    fclose(fout);
+
+    //end debug
+     (*n) = schedule_arr_pos ;
 }
 ////test
 
 void schedule_main()
 {
     NavRoad * nav_road_arr;
+
     NavRoadKeyNode * nav_key_node_arr ;
 
     //1% 的内存

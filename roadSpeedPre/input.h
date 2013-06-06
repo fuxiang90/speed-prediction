@@ -63,6 +63,9 @@ RoadInfo * RoadInfoInput(RoadInfo * head );
 
 void RoadInfoRealease(RoadInfo * head);
 
+//释放 head 中list 的内存
+void RoadInfoClistRealease(RoadInfo * head);
+
 void RoadInfoShow(RoadInfo * head,char *out_name);
 void RoadInfoProcess(RoadInfo *head);
 

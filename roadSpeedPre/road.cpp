@@ -223,20 +223,42 @@ void check_locid_pre( LocRoad * loc_road_arr  ,NavRoad  *nav_road_arr , NavRoadK
 
 void get_locid_pre( LocRoad * loc_road_arr  ,NavRoad  *nav_road_arr , NavRoadKeyNode *  nav_key_node_arr)
 {
+    static int count = 0;
 
-    for(int i = 1 ; i <= real_loc_road_count ; i++){
+    FILE * fout = fopen("degree","w");
+    for(int i = 1 ; i < MAX_LOC_ROAD ; i++){ // bug 2013年6月5日 real_loc_road_count
 
         int locid = loc_road_arr[i].locid ;
 
-        if(locid == 390){
+        if(locid == 0) continue;
+
+        //debug
+        if(locid == 390  || locid == 3760 || locid == 3860){
             locid ++;
             locid --;
         }
 
         int pre_locid = nav_bfs(locid,loc_road_arr ,nav_road_arr ,nav_key_node_arr);
 
-        loc_road_arr[i].pre_locid = pre_locid;
+        //debug 2013年6月4日
+
+        if(pre_locid == 0){
+
+            pre_locid ++;
+            pre_locid --;
+            fprintf(fout,"%d\n",locid);
+        }
+        ////
+        count ++;
+        //如果没有得到上一条路 ，那么这个的上一条路就是他自己
+        if(pre_locid == 0){
+            loc_road_arr[i].pre_locid = locid;
+        }else
+            loc_road_arr[i].pre_locid = pre_locid;
+
     }
+
+    printf("%d",count);
 }
 void road_main()
 {

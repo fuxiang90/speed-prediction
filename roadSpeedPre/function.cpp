@@ -131,20 +131,90 @@ int get_locid_str(char * str)
     return id;
 
 }
+
+int get_dir_filenames( char  * * filename_arr  ,int max_file_num)
+{
+
+    int filenum = 0;
+    const char *dir = txt_root_path;
+
+    DIR *dp;
+    struct dirent *entry;
+    struct stat statbuf;
+    if( (dp = opendir(dir))  == NULL )
+    {
+        fprintf(stderr, "cannot open directory: %s\n", dir);
+        return -1;
+    }
+
+    while( (entry = readdir(dp)) != NULL)
+    {
+        if( S_ISDIR(statbuf.st_mode) )
+        {
+//            if( strcmp(".", entry->d_name) == 0 || strcmp("..", entry->d_name) == 0 )
+//                continue;
+        }
+        else
+        {
+            if(entry->d_name[0] == '.')
+                continue;
+            strcpy(filename_arr[filenum++], entry->d_name);
+
+        }
+    }
+
+    closedir(dp);
+
+    return filenum;
+
+}
+
+void get_filename(int locid ,char str[])
+{
+    sprintf(str,"%d",locid);
+    int len = strlen(str);
+    char last = str[len-1];
+    str[len-1] = '_';
+    str[len] = last ;
+    str[len+1] = '.';
+    str[len+2] = 't';
+    str[len+3] = 'x';
+    str[len+4] = 't';
+    str[len+5] = '\0';
+}
 void testFun()
 {
 
     //printf("%d\n",ZellerFun(2049,10,1));
 
-    char * str = (char *)malloc(100 * sizeof(char));
-    char *from = (char *)malloc(100 * sizeof(char));
-    char *to  = (char *)malloc(100 * sizeof(char));
+//    char * str = (char *)malloc(100 * sizeof(char));
+//    char *from = (char *)malloc(100 * sizeof(char));
+//    char *to  = (char *)malloc(100 * sizeof(char));
+//
+//    strcpy(str ,__DATE__);
+//    strcpy(from," ");
+//    strcpy(to,"");
+//
+//    printf( "%s",replaceAll(str,from,to) );
 
-    strcpy(str ,__DATE__);
-    strcpy(from," ");
-    strcpy(to,"");
 
-    printf( "%s",replaceAll(str,from,to) );
+//    char ** filename_arr  = (char **) malloc ( sizeof(char *) * MAX_LOC_ROAD);
+//
+//    MAX_TXT_NAME_LEN
+//    for(int i = 0  ; i < MAX_LOC_ROAD ; i++){
+//        filename_arr[i] = (char *)malloc(MAX_TXT_NAME_LEN);
+//    }
+//
+//    int n = get_dir_filenames(filename_arr ,MAX_TXT_NAME_LEN);
+//
+//    for(int i = 0 ; i < n ; i ++){
+//        printf("%s\n",filename_arr[i]);
+//    }
 
+    char str[20];
+    get_filename(122,str);
+
+    printf("%s\n",str);
 
 }
+

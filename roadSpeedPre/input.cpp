@@ -40,13 +40,15 @@ RoadInfo * RoadInfoInput(RoadInfo * head )
 
         file_p = fopen(data_path_str[i] ,"r");
         if(file_p == NULL) {
-            printf("%s open error\n",data_path_str[i]);
+            fprintf(stderr,"%s open error\n",data_path_str[i]);
             return NULL;
         }
         //读取文件内容
         while(fgets(in_str,MAX_STRLEN ,file_p)) {
 
             if(strlen(in_str) <  DATA_LEN-5) continue;
+
+
 
             getInfoStr(in_str ,head,&now_time);
 
@@ -97,6 +99,7 @@ void getInfoStr(char * in_str ,RoadInfo * head ,struct date_t * mtime)
     tmp.mouth = m;
     tmp.day = d;
 
+    //通过时间来控制，是否新增一个节点
     if(tmp.cmp (mtime) != 0) {
         (*mtime) = tmp;
         // 相对于 cslist 而言 这更像是用户程序  我自己定义list 里面的数据结构
@@ -114,9 +117,9 @@ void getInfoStr(char * in_str ,RoadInfo * head ,struct date_t * mtime)
     token = strtok(NULL," ");
     int h,mi,s;
     //有当到达零点的时候 没有时间这个数据
-    if(strlen(token) == 0){
+    if(token == NULL || strlen(token) == 0){
         h = 0;
-        m = 0;
+        mi = 0 ;//m = 0;  // bug fix 2013年5月31日
         s = 0;
     }else {
         sscanf(token,"%d:%d:%d",&h,&mi,&s);
@@ -231,6 +234,14 @@ void RoadInfoRealease(RoadInfo * head)
         head = head->next;
         free(temp);
     }
+}
+void RoadInfoClistRealease(RoadInfo * head)
+{
+    while(head){
+        CSlistRelease(head->road_list );
+        head = head->next;
+    }
+
 }
 /*为梯度下降算法准备 输入文件*/
 void GradientDescentProcess(RoadInfo *head ,char * out_file_name ,int flag)
