@@ -40,7 +40,7 @@ RoadInfo * RoadInfoInput(RoadInfo * head )
 
         file_p = fopen(data_path_str[i] ,"r");
         if(file_p == NULL) {
-            fprintf(stderr,"%s open error\n",data_path_str[i]);
+            fprintf(stdout,"%s open error\n",data_path_str[i]);
             return NULL;
         }
         //读取文件内容
@@ -136,8 +136,91 @@ void getInfoStr(char * in_str ,RoadInfo * head ,struct date_t * mtime)
         all_mi ++;
         all_mi --;
     }
-    head->history_road[week_t][all_mi/STEP] += speed;
-    head->road_times_arr[week_t][all_mi/STEP] ++;
+    //head->history_road[week_t][all_mi/STEP] += speed;
+    //head->road_times_arr[week_t][all_mi/STEP] ++;
+
+    ( (struct road_t *) (head->road_list->tail->value) )->speed_arr[all_mi/STEP] += speed;
+    ( (struct road_t *) (head->road_list->tail->value) )->times[all_mi/STEP] ++;
+    ( (struct road_t *) (head->road_list->tail->value) )->weekday = week_t;
+
+
+}
+
+void getInfoStr(char * in_str ,
+                RoadInfo * head,
+                struct date_t * mtime,
+                struct  LocRoad_t * loc_road )
+{
+    char *token = strtok(in_str," ");
+
+    //将 88_0 转成 880
+    char loc_str[10];
+    int j = 0;
+    for(int i = 0 ; i < (int)strlen(token) ; i ++){
+        if( isdigit( token[i])  ){
+            loc_str[j++] = token[i];
+        }
+    }
+    loc_str[j] = '\0';
+
+
+    int road_id = atoi(loc_str);
+    head->road_id = road_id;
+
+    token = strtok(NULL," ");
+    double speed = strtod(token,NULL);
+    assert(speed > 0.02);
+
+    token = strtok(NULL," ");
+    int y,m,d;
+    sscanf(token,"%d-%d-%d",&y,&m,&d);
+
+    struct date_t tmp;
+    tmp.year= y;
+    tmp.mouth = m;
+    tmp.day = d;
+
+    //通过时间来控制，是否新增一个节点
+    if(tmp.cmp (mtime) != 0) {
+        (*mtime) = tmp;
+        // 相对于 cslist 而言 这更像是用户程序  我自己定义list 里面的数据结构
+        struct road_t * road_node = (struct road_t * )malloc(sizeof (struct road_t) );
+        if(road_node == NULL)return ;
+        road_node->weekday = 0;
+        memset(road_node->times,0 ,sizeof(road_node->times)  );
+        memset(road_node->speed_arr,0 ,sizeof(road_node->speed_arr)  );
+        CSlistAddNodeTail(head->road_list ,road_node);
+    }
+    if(head->mtime.cmp(&tmp) > 0 ) {
+        return ;
+    }
+
+    token = strtok(NULL," ");
+    int h,mi,s;
+    //有当到达零点的时候 没有时间这个数据
+    if(token == NULL || strlen(token) == 0){
+        h = 0;
+        mi = 0 ;//m = 0;  // bug fix 2013年5月31日
+        s = 0;
+    }else {
+        sscanf(token,"%d:%d:%d",&h,&mi,&s);
+    }
+
+
+
+    int week_t = ZellerFun(y,m,d) ;
+    int all_mi = h * 60 +mi;
+
+
+
+    if(speed < 0.02 ) {
+        all_mi ++;
+        all_mi --;
+    }
+    //head->history_road[week_t][all_mi/STEP] += speed;
+    loc_road->history_road[week_t][all_mi/STEP] += speed;
+    //head->road_times_arr[week_t][all_mi/STEP] ++;
+    loc_road->road_times_arr[week_t][all_mi/STEP] ++;
 
     ( (struct road_t *) (head->road_list->tail->value) )->speed_arr[all_mi/STEP] += speed;
     ( (struct road_t *) (head->road_list->tail->value) )->times[all_mi/STEP] ++;
@@ -162,10 +245,10 @@ void RoadInfoShow(RoadInfo * head ,char *out_name)
             for(int j = 0 ; j < TIMES_DAY ; j ++) {
 
                 //如果当前没有收集到信息 取一个默认的值
-                if(head->road_times_arr[i][j] == 0) {
-                    fprintf(out_file,"%d %d %lf\n",i ,j,30.0);
-                } else
-                    fprintf(out_file,"%d %d %lf \n",i,j,head->history_road[i][j]);
+//                if(head->road_times_arr[i][j] == 0) {
+//                    fprintf(out_file,"%d %d %lf\n",i ,j,30.0);
+//                } else
+//                    fprintf(out_file,"%d %d %lf \n",i,j,head->history_road[i][j]);
 
             }
         }
@@ -177,54 +260,7 @@ void RoadInfoShow(RoadInfo * head ,char *out_name)
     fclose(out_file);
 
 }
-void RoadInfoProcess(RoadInfo *head)
-{
-    RoadInfo * temp = head;
-    while( head ) {
 
-        for(int i = 0 ; i < 7 ; i ++) {
-            for(int j = 0 ; j < TIMES_DAY ; j ++) {
-
-                if(head->road_times_arr[i][j] == 0) {
-                    head->history_road[i][j] = 30.0;
-                } else {
-                    head->history_road[i][j]/=head->road_times_arr[i][j];
-                }
-
-            }
-        }
-
-        head = head->next;
-
-    }
-
-    head = temp;
-
-    while( head ) {
-        CSlistNode * l_head = head->road_list->head;
-        //遍历某条路 每一天的数据
-        while(l_head ) {
-
-            //遍历每一个时刻的数据
-            for(int i = 0 ; i < TIMES_DAY ; i ++) {
-                  // debug
-                if( ((struct road_t*) (l_head->value))->speed_arr[i]  < 0.2){
-                    ((struct road_t*) (l_head->value))->speed_arr[i]  =  head->history_road[((struct road_t*) (l_head->value))->weekday ][i];
-                }else
-                    ((struct road_t*) (l_head->value))->speed_arr[i] /= ((struct road_t*) (l_head->value))->times[i] ;
-
-
-
-            }
-            l_head = l_head->next;
-        }
-
-
-        head = head->next;
-
-    }
-
-}
 void RoadInfoRealease(RoadInfo * head)
 {
     while(head){
@@ -243,94 +279,8 @@ void RoadInfoClistRealease(RoadInfo * head)
     }
 
 }
-/*为梯度下降算法准备 输入文件*/
-void GradientDescentProcess(RoadInfo *head ,char * out_file_name ,int flag)
-{
-    char *root_path = (char *)malloc(sizeof(char)*10);
-    strcpy(root_path,"./data/");
-    //out_file = fopen(out_file_name,"w");
-    char *file_name = (char *)malloc(sizeof(char)*100);
-
-    while(head) {
-
-        if(head->pre) {
 
 
-            RoadInfo * pre_road = head->pre;
-            CSlistNode * pre_l_head = pre_road->road_list->head;
-            CSlistNode * now_l_head = head->road_list->head;
-
-
-            FILE * out_file;
-            memset(file_name,0,sizeof(file_name));
-            strcpy(file_name ,root_path);
-
-            if(flag == 2){
-                sprintf(file_name,"%s%d-%d-test",root_path,head->road_id,STEP);
-            }else {
-                sprintf(file_name,"%s%d-%d-train",root_path,head->road_id,STEP);
-            }
-
-
-            out_file = fopen(file_name,"w");
-
-
-
-            double now_thisroad_speed           = 0.0;
-            double now_preroad_speed            = 0.0;
-            double next_preroad_histroy_speed   = 0.0;
-            double next_thisroad_histroy_speed  = 0.0;
-
-            double next_thisroad_speed          = 0.0;
-            int roadid = head->road_id;
-            while(now_l_head ) {
-
-                int weekday = ((struct road_t*) (now_l_head->value))->weekday;
-
-                //if(weekday >= 2 &&weekday <= 4)
-                //遍历每一个时刻的数据
-                for(int i = 0 ; i < TIMES_DAY ; i ++) {
-                    now_thisroad_speed =  ((struct road_t*) (now_l_head->value))->speed_arr[i];
-                    now_preroad_speed = ((struct road_t*) (pre_l_head->value))->speed_arr[i];
-
-
-
-                    if(i+1 != TIMES_DAY){
-                        next_thisroad_histroy_speed =  head->history_road[weekday][i+1];
-                        next_thisroad_speed = ((struct road_t*) (now_l_head->value))->speed_arr[i+1];
-                    }else{
-                        next_thisroad_histroy_speed = head->history_road[weekday][i]; //这个时候 就是接近午夜十二点的时刻
-                        next_thisroad_speed = ((struct road_t*) (now_l_head->value))->speed_arr[i];
-                    }
-
-
-                    if(i+1 != TIMES_DAY)
-                        next_preroad_histroy_speed =  pre_road->history_road[weekday][i+1];
-                    else
-                        next_preroad_histroy_speed = pre_road->history_road[weekday][i]; //这个时候 就是接近午夜十二点的时刻
-
-
-                   fprintf(out_file ,"%d %d %lf %lf %lf %lf %lf\n",
-                            roadid , weekday ,now_thisroad_speed ,now_preroad_speed ,next_preroad_histroy_speed ,
-                            next_thisroad_histroy_speed,next_thisroad_speed);
-                }
-                now_l_head = now_l_head->next;
-            }//end while
-
-            fclose(out_file);
-
-
-        }//end if
-        //fclose(out_file);
-
-        head = head->next;
-    }// end while
-
-    free(file_name);
-    free(root_path);
-
-
-}
 void testInput()
 {
     char * out_file_name1 = (char *)malloc(sizeof(char)*50);
@@ -338,7 +288,7 @@ void testInput()
     RoadInfo * p ;
     p = RoadInfoCreat();
     p = RoadInfoInput(p);
-    RoadInfoProcess(p);
+    //RoadInfoProcess(p);
     //GradientDescentProcess(p,strcpy(out_file_name1, "./data/276-data-all") );
 //    GradientDescentProcess(p,strcpy(out_file_name1, "./data/376-data-all") ,2);
 //    RoadInfoShow(p,strcpy(out_file_name2,"./data/376.out") );

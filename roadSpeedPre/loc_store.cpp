@@ -7,7 +7,7 @@ void store_loc_in_file( LocRoad * loc_road_arr  )
 
     FILE * fout = fopen(txt_loc_store_path ,"w");
     if(fout == NULL){
-        fprintf(stderr ,"%s open error\n",txt_loc_store_path);
+        fprintf(stdout ,"%s open error\n",txt_loc_store_path);
         exit(0);
     }
     for(int i = 1 ; i < MAX_LOC_ROAD ; i++){
@@ -38,7 +38,7 @@ void get_loc_from_file( LocRoad * loc_road_arr)
 {
     FILE * fin = fopen(txt_loc_store_path ,"r");
     if(fin == NULL){
-        fprintf(stderr ,"%s open error\n",txt_loc_store_path);
+        fprintf(stdout ,"%s open error\n",txt_loc_store_path);
         exit(0);
     }
     int i ;
@@ -57,6 +57,8 @@ void get_loc_from_file( LocRoad * loc_road_arr)
         loc_road_arr[i].locid =locid;
         loc_road_arr[i].pre_locid = pre_locid;
 
+        //2013年6月8日
+        loc_road_arr_node_malloc(&loc_road_arr[i]);
         for(int j = 0 ; j < 7 ; j ++){
             for(int k = 0 ; k < TIMES_DAY ; k++){
                 fscanf(fin ,"%lf",&loc_road_arr[i].history_road[j][k]);

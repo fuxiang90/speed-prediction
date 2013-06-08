@@ -69,7 +69,7 @@ void graph_topo_sort(int * * schedule_arr  ,int *n , ScheduleGraph * graph )
     (*schedule_arr) = (int *)malloc(sizeof(int)*MAX_LOC_ROAD);
     if((*schedule_arr) == NULL){
 
-        fprintf(stderr ,"memory error\n");
+        fprintf(stdout ,"memory error\n");
         exit(0);
     }
     for(int i = 1 ; i < MAX_LOC_ROAD ; i ++){
@@ -82,7 +82,7 @@ void graph_topo_sort(int * * schedule_arr  ,int *n , ScheduleGraph * graph )
     printf("%d\n",node_q.size());
     FILE * fin = fopen(txt_cycle_path,"r");
     if(fin == NULL){
-        fprintf(stderr,"%s\n open error",txt_cycle_path);
+        fprintf(stdout,"%s\n open error",txt_cycle_path);
         exit(0);
     }
 
@@ -131,7 +131,7 @@ void graph_topo_sort(int * * schedule_arr  ,int *n , ScheduleGraph * graph )
     //debug
     FILE * fout = fopen("schedule","w");
     if(fout == NULL){
-        fprintf(stderr," open error");
+        fprintf(stdout," open error");
         exit(0);
     }
 

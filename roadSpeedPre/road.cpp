@@ -34,6 +34,8 @@ void nav_road_init(NavRoad * *nav_road_arr , NavRoadKeyNode *  *nav_key_node_arr
 
     locid_hash = (int *)malloc(sizeof(int) *MAX_LOC_ROAD);
 
+    memset(locid_hash,0,sizeof(int) *MAX_LOC_ROAD);//2013年6月8日 xp  下面的并不会自动赋值为0
+
 
 }
 
@@ -80,6 +82,84 @@ void nav_road_create(NavRoad * nav_road_arr , NavRoadKeyNode *  nav_key_node_arr
 
 }
 
+LocRoad * loc_road_arr_create(int n)
+{
+    //LocRoad * arr = (LocRoad *)malloc(sizeof(LocRoad) * n);
+ 	LocRoad * arr = new LocRoad[n];
+    if(arr == NULL){
+        fprintf(stdout ,"loc_road_arr_create  memory \n");
+        exit(0);
+    }
+	for(int i = 0 ; i < n ; i ++){
+		arr[i].locid = 0;
+		arr[i].pre_locid = 0;
+		arr[i].flag = 0;
+	}
+	return arr;
+}
+int loc_road_arr_node_malloc(LocRoad * loc_road)
+{
+    loc_road->history_road = (double ** )malloc(sizeof(double *) * 7);
+
+    for(int i = 0 ; i < 7 ; i ++){
+        loc_road->history_road[i] = (double *) malloc(sizeof( double ) * TIMES_DAY);
+    }
+
+     loc_road->weights_arr = (double ** )malloc(sizeof(double *) * 7);
+
+     for(int i = 0 ; i < 7 ; i ++){
+        loc_road->weights_arr[i] = (double *) malloc(sizeof( double ) * 5);
+    }
+
+
+
+     loc_road->road_times_arr = (int ** )malloc(sizeof(int *) * 7);
+
+     for(int i = 0 ; i < 7 ; i ++){
+        loc_road->road_times_arr[i] = (int *) malloc(sizeof( int ) * TIMES_DAY);
+    }
+
+    return 1;
+
+}
+int loc_road_arr_node_free(LocRoad * loc_road)
+{
+    for(int i = 0 ; i < 7 ; i ++){
+        free(loc_road->history_road[i] );
+    }
+    free(loc_road->history_road);
+    loc_road->history_road = NULL;
+
+    for(int i = 0 ; i < 7 ; i ++){
+        free(loc_road->weights_arr[i] );
+
+    }
+    free(loc_road->weights_arr);
+    loc_road->weights_arr = NULL;
+
+    if(loc_road->road_times_arr != NULL){
+         for(int i = 0 ; i < 7 ; i ++){
+            if(loc_road->road_times_arr[i] != NULL)
+                free(loc_road->road_times_arr[i] );
+        }
+        free(loc_road->road_times_arr);
+        loc_road->road_times_arr = NULL;
+    }
+    return 1;
+}
+
+int loc_road_arr_node_free_road_times(LocRoad * loc_road)
+{
+
+    for(int i = 0 ; i < 7 ; i ++){
+        free(loc_road->road_times_arr[i] );
+
+    }
+    free(loc_road->road_times_arr);
+    loc_road->road_times_arr = NULL;
+
+    return 1;
+}
 void nav_get_node_info(NavRoad * nav_road_arr , NavRoadKeyNode *  nav_key_node_arr)
 {
 
@@ -141,6 +221,8 @@ void get_locid_seq( LocRoad * loc_road_arr , NavRoad *nav_road_arr )
 
         loc_road_arr[loc_road_pos].road_seq_vec.push_back(road_seq);
 
+        //2013年6月8日
+        loc_road_arr_node_malloc(&loc_road_arr[loc_road_pos]);
         nav_road_arr[road_seq].locid = locid;
     }
 

@@ -43,7 +43,7 @@ void predict_init();
 
 void get_road_info(RoadInfo * road_info_arr);
 
-int get_road_info_filename(RoadInfo * head , char *filename );
+int get_road_info_filename(RoadInfo * head , char *filename  ,  LocRoad * loc_road_arr ,int loc_pos);
 
 
 //生成所有的history_road 的数据
@@ -51,7 +51,10 @@ void get_road_info_history(RoadInfo  *road_info_arr);
 
 void get_road_info_history_node(RoadInfo  *road_info ,RoadInfo * pre_road_info, LocRoad * loc_road_arr ) ;
 
-void roado_info_process_one(RoadInfo * head);
+void road_info_process_one(RoadInfo * head ,LocRoad * loc_road);
+
+//得到历史数据
+void loc_road_info_process_one( LocRoad * loc_road);
 
 void road_info_process(RoadInfo  *road_info_arr );
 

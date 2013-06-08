@@ -26,8 +26,8 @@ int main()
 //
 //    testFun();
 //    schedule_main();
-//    predict_schedule_main();
-    predict_main();
+    predict_schedule_main();
+    //predict_main();
     cout << "Hello world!" << endl;
     return 0;
 }

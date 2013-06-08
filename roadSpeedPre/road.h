@@ -44,9 +44,16 @@ struct LocRoad_t
 
     int locid;
     int pre_locid; //他的上一个locid
-    double  history_road[7][TIMES_DAY]; //这条道路 7天历史时刻，每个时间段的平均速度
-    double  weights_arr[7][5]; //每个对应一个权值
+    int flag;
+    //double  history_road[7][TIMES_DAY]; //这条道路 7天历史时刻，每个时间段的平均速度
+    //直接开 内存浪费太多 在xp上有点跑不动
+    double * * history_road;
+    //double  weights_arr[7][5]; //每个对应一个权值
 
+    //
+    double  **weights_arr;
+
+    int ** road_times_arr;
     std::vector< int > road_seq_vec; // nav road seq
 
 
@@ -60,6 +67,16 @@ void nav_road_init(NavRoad * *nav_road_arr , NavRoadKeyNode *  *nav_key_node_arr
 void nav_road_create(NavRoad * nav_road_arr , NavRoadKeyNode *  nav_key_node_arr);
 
 void nav_get_node_info(NavRoad * nav_road_arr , NavRoadKeyNode *  nav_key_node_arr);
+
+//创建 一个 loc——road——arr 数组
+LocRoad * loc_road_arr_create(int n);
+
+//为locroad 里面的 history_road  weights_arr 分配内存   2013年6月8日
+int loc_road_arr_node_malloc(LocRoad * loc_road);
+
+int loc_road_arr_node_free(LocRoad * loc_road);
+
+int loc_road_arr_node_free_road_times(LocRoad * loc_road);
 
 
 //主要是将loc id  和 roadseq 对应起来 ，在相应的数据结构中赋值

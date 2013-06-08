@@ -143,7 +143,7 @@ int get_dir_filenames( char  * * filename_arr  ,int max_file_num)
     struct stat statbuf;
     if( (dp = opendir(dir))  == NULL )
     {
-        fprintf(stderr, "cannot open directory: %s\n", dir);
+        fprintf(stdout, "cannot open directory: %s\n", dir);
         return -1;
     }
 

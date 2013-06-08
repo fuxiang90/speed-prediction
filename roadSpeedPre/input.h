@@ -5,6 +5,8 @@
 #include "function.h"
 #include "CSlist.h"
 
+#include "road.h"
+
 #include <string>
 #include <assert.h>
 
@@ -53,8 +55,8 @@ struct road_info_t{
     struct road_info_t * pre;//他上一条道路
     struct road_info_t * next;//他下一条道路
 
-    double  history_road[7][TIMES_DAY]; //这条道路 7天历史时刻，每个时间段的平均速度
-    int road_times_arr[7][TIMES_DAY];  //记录这条道路 每个时刻 有多少次数据
+    //double  history_road[7][TIMES_DAY]; //这条道路 7天历史时刻，每个时间段的平均速度
+    //int road_times_arr[7][TIMES_DAY];  //记录这条道路 每个时刻 有多少次数据
 
     int flag ; //表示有history的数据
 
@@ -71,13 +73,12 @@ void RoadInfoRealease(RoadInfo * head);
 void RoadInfoClistRealease(RoadInfo * head);
 
 void RoadInfoShow(RoadInfo * head,char *out_name);
-void RoadInfoProcess(RoadInfo *head);
 
 
 
-void GradientDescentProcess(RoadInfo *head,char * out_file_name ,int flag = 1);
 
-void getInfoStr(char * in_str ,RoadInfo * head,struct date_t * );
+void getInfoStr(char * in_str ,RoadInfo * head,struct date_t * now_time, struct  LocRoad_t * loc_road );
+void getInfoStr(char * in_str ,RoadInfo * head,struct date_t * mtime   );
 
 /*test*/
 
