@@ -10,8 +10,10 @@ struct value_t{
     char *str;
 };
 
-static int  CSlistMatch(struct value_t * key_a ,struct value_t*  key_b )
+static int  CSlistMatch(void * a ,void *b )
 {
+	struct value_t *key_a = (struct value_t *)a;
+	struct value_t * key_b = (struct value_t *)b;
     if(key_a->data == key_b ->data &&  0==strcmp(key_a->str ,key_b->str))
         return 1;
     return 0;

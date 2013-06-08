@@ -1,17 +1,21 @@
 #ifndef INPUT_H_INCLUDED
 #define INPUT_H_INCLUDED
 
+
 #include "function.h"
 #include "CSlist.h"
 
 #include <string>
 #include <assert.h>
 
-#include "fGradient_descent.h"
+
+using namespace std;
+//#include "fGradient_descent.h"
 //将从数据库中提取的道路数据 转换成我所要的格式
-// 并为
 
 
+//多长时间 为一个间隔
+//TIMES_DAY 那么一天可以分割多少个间隔
 const int STEP = 4;
 const int TIMES_DAY = 24*60 / STEP;
 
@@ -79,5 +83,4 @@ void getInfoStr(char * in_str ,RoadInfo * head,struct date_t * );
 
 void testInput();
 
-void testNow();
 #endif // INPUT_H_INCLUDED

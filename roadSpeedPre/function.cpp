@@ -131,7 +131,7 @@ int get_locid_str(char * str)
     return id;
 
 }
-
+#if OS_LINUX
 int get_dir_filenames( char  * * filename_arr  ,int max_file_num)
 {
 
@@ -168,7 +168,7 @@ int get_dir_filenames( char  * * filename_arr  ,int max_file_num)
     return filenum;
 
 }
-
+#endif
 void get_filename(int locid ,char str[])
 {
     sprintf(str,"%d",locid);

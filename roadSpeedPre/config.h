@@ -7,16 +7,18 @@
 #include <cctype>
 #include <cmath>
 #include <vector>
-
+#include <string>
 
 
 /*
-*如要在linux 下编译 请加上这句#define OS_LINUX
-*如果在windows 下 请注释掉
+*如要在linux 下编译
+#define OS_LINUX 1
+*如果在windows 下
+#define OS_LINUX 0
 */
 #define OS_LINUX 1
 
-#ifdef OS_LINUX
+#if OS_LINUX
 #include <dirent.h>
 #include <sys/stat.h>
 #endif
@@ -35,4 +37,5 @@ extern const char * NAV_ROAD_FILE ;
 extern const char * LOCID_SEQ_FILE;
 extern const char * txt_root_path ;
 extern const char * txt_cycle_path;
+extern const char * txt_loc_store_path;
 #endif // CONFIG_H_INCLUDED

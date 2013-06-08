@@ -29,6 +29,7 @@
 #include "road.h"
 #include "gradient_descent.h"
 #include "schedule.h"
+#include "loc_store.h"
 
 using namespace std;
 
@@ -36,8 +37,9 @@ using namespace std;
 /*
 生成 一个 roadinfo的数组
 */
-RoadInfo * predict_init();
+RoadInfo * predict_roadinfo_create();
 
+void predict_init();
 
 void get_road_info(RoadInfo * road_info_arr);
 
@@ -68,7 +70,7 @@ double  prediction_train_loc_road_next(LocRoad * loc_road_arr ,
 
 //查询指定时间之后 的历史数据
 int  history_train_loc_road( double * speed_arr ,
-LocRoad * loc_road_arr ,int weekday ,int h ,int m ,double speed ,int locid ,int next_time );
+LocRoad * loc_road_arr ,int weekday ,int h ,int m ,int locid ,int next_time );
 
 //test 检查 梯度下降的准确性
 void check_train_loc_road(LocRoad * loc_road_arr );
@@ -80,10 +82,15 @@ void schedule_train_loc_road(int * schedule_arr  ,int n, LocRoad * loc_road_arr 
 //训练单个道路 并把权值放在loc_road_arr 里面
 void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad * loc_road_arr);
 
+/*
+从文件中读loc信息
+*/
 void predict_main();
 
 
 // 使用调度算法的预测
 void predict_schedule_main();
+
+void predict_test(LocRoad * loc_road_arr);
 
 #endif // PREDICTION_H_INCLUDED
