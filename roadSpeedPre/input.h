@@ -48,12 +48,12 @@ struct road_info_t{
     //struct road_t * road_arr;
     CSlist * road_list;//记录这条路 每一天的速度
     struct date_t mtime;//string mtime;//起始时间
-    std::string road_str;
+    //std::string road_str;
     //int len ; //记录了多少条路
     int road_id;
 
-    struct road_info_t * pre;//他上一条道路
-    struct road_info_t * next;//他下一条道路
+    //struct road_info_t * pre;//他上一条道路
+    //struct road_info_t * next;//他下一条道路
 
     //double  history_road[7][TIMES_DAY]; //这条道路 7天历史时刻，每个时间段的平均速度
     //int road_times_arr[7][TIMES_DAY];  //记录这条道路 每个时刻 有多少次数据

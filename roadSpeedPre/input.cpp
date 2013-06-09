@@ -14,8 +14,8 @@ RoadInfo * RoadInfoCreat()
     road_info_p->mtime.year = 2012;
     road_info_p->mtime.mouth = 11;
     road_info_p->mtime.day = 21;
-    road_info_p->pre = NULL;
-    road_info_p->next = NULL;
+    //road_info_p->pre = NULL;
+    //road_info_p->next = NULL;
 
     road_info_p->road_list = CSlistCreate();
 
@@ -33,8 +33,8 @@ RoadInfo * RoadInfoInput(RoadInfo * head )
     for(int i = 0 ; i < 2 ; i ++) {
         if(i != 0 ) {
             RoadInfo * head_node = RoadInfoCreat();
-            head -> next = head_node;
-            head_node ->pre = head;
+            //head -> next = head_node;
+            //head_node ->pre = head;
             head = head_node;
         }
 
@@ -230,52 +230,52 @@ void getInfoStr(char * in_str ,
 }
 void RoadInfoShow(RoadInfo * head ,char *out_name)
 {
-    FILE * out_file;
-    out_file = fopen(out_name,"w");
-    if(out_file == NULL) {
-        //printf("")
-        return ;
-    }
-    while( head ) {
-        fprintf(out_file,"-----------------%d-------------\n",head->road_id);
+//    FILE * out_file;
+//    out_file = fopen(out_name,"w");
+//    if(out_file == NULL) {
+//        //printf("")
+//        return ;
+//    }
+//    while( head ) {
+//        fprintf(out_file,"-----------------%d-------------\n",head->road_id);
+//
+//
+//
+//        for(int i = 0 ; i < 7 ; i ++) {
+//            for(int j = 0 ; j < TIMES_DAY ; j ++) {
+//
+//                //如果当前没有收集到信息 取一个默认的值
+////                if(head->road_times_arr[i][j] == 0) {
+////                    fprintf(out_file,"%d %d %lf\n",i ,j,30.0);
+////                } else
+////                    fprintf(out_file,"%d %d %lf \n",i,j,head->history_road[i][j]);
+//
+//            }
+//        }
+//
+//        head = head->next;
+//
+//    }
 
-
-
-        for(int i = 0 ; i < 7 ; i ++) {
-            for(int j = 0 ; j < TIMES_DAY ; j ++) {
-
-                //如果当前没有收集到信息 取一个默认的值
-//                if(head->road_times_arr[i][j] == 0) {
-//                    fprintf(out_file,"%d %d %lf\n",i ,j,30.0);
-//                } else
-//                    fprintf(out_file,"%d %d %lf \n",i,j,head->history_road[i][j]);
-
-            }
-        }
-
-        head = head->next;
-
-    }
-
-    fclose(out_file);
+    //fclose(out_file);
 
 }
 
 void RoadInfoRealease(RoadInfo * head)
 {
-    while(head){
+    if(head){
         CSlistRelease(head->road_list );
         RoadInfo * temp = head;
 
-        head = head->next;
+        //head = head->next;
         free(temp);
     }
 }
 void RoadInfoClistRealease(RoadInfo * head)
 {
-    while(head){
+    if(head){
         CSlistRelease(head->road_list );
-        head = head->next;
+       // head = head->next;
     }
 
 }
@@ -283,8 +283,8 @@ void RoadInfoClistRealease(RoadInfo * head)
 
 void testInput()
 {
-    char * out_file_name1 = (char *)malloc(sizeof(char)*50);
-    char * out_file_name2 = (char *)malloc(sizeof(char)*50);
+
+
     RoadInfo * p ;
     p = RoadInfoCreat();
     p = RoadInfoInput(p);

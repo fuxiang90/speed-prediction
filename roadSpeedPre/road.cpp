@@ -5,7 +5,7 @@ static  int real_road_count = 0;
 static  int real_key_node_count = 0;
 static  int real_loc_road_count = 0;
 
-static map<int,int> locid_pos_map ;
+//static map<int,int> locid_pos_map ;
 
 int *locid_hash;
 
@@ -103,12 +103,15 @@ int loc_road_arr_node_malloc(LocRoad * loc_road)
 
     for(int i = 0 ; i < 7 ; i ++){
         loc_road->history_road[i] = (double *) malloc(sizeof( double ) * TIMES_DAY);
+        memset(loc_road->history_road[i] ,0 ,sizeof( double ) * TIMES_DAY) ;//win 下 一定要初始化
     }
 
      loc_road->weights_arr = (double ** )malloc(sizeof(double *) * 7);
 
      for(int i = 0 ; i < 7 ; i ++){
         loc_road->weights_arr[i] = (double *) malloc(sizeof( double ) * 5);
+
+        memset(loc_road->weights_arr[i] , 0,sizeof(double )*5);
     }
 
 
@@ -117,6 +120,7 @@ int loc_road_arr_node_malloc(LocRoad * loc_road)
 
      for(int i = 0 ; i < 7 ; i ++){
         loc_road->road_times_arr[i] = (int *) malloc(sizeof( int ) * TIMES_DAY);
+        memset(loc_road->road_times_arr[i] , 0,sizeof(int)*TIMES_DAY);
     }
 
     return 1;
@@ -150,7 +154,8 @@ int loc_road_arr_node_free(LocRoad * loc_road)
 
 int loc_road_arr_node_free_road_times(LocRoad * loc_road)
 {
-
+    if(loc_road == NULL)
+        return 0;
     for(int i = 0 ; i < 7 ; i ++){
         free(loc_road->road_times_arr[i] );
 

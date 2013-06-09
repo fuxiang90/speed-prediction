@@ -47,8 +47,9 @@ struct LocRoad_t
     int flag;
     //double  history_road[7][TIMES_DAY]; //这条道路 7天历史时刻，每个时间段的平均速度
     //直接开 内存浪费太多 在xp上有点跑不动
-    double * * history_road;
+    double * * history_road; //但是如果频繁的调用malloc 开销有点大
     //double  weights_arr[7][5]; //每个对应一个权值
+
 
     //
     double  **weights_arr;

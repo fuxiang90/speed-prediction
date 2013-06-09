@@ -85,6 +85,11 @@ void schedule_train_loc_road(int * schedule_arr  ,int n, LocRoad * loc_road_arr 
 //训练单个道路 并把权值放在loc_road_arr 里面
 void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad * loc_road_arr);
 
+//bate 准备替换掉里面的vector ，用纯c来做
+void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad * loc_road_arr);
+
+
+
 /*
 从文件中读loc信息
 */

@@ -12,6 +12,8 @@ CMat *CMatCreate(int row ,int col)
         return NULL;
     }
 
+    memset(m->data ,0,sizeof(double )*n); //2013年6月9日
+
     m->row = row;
     m->col = col;
 
