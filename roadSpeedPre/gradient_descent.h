@@ -30,6 +30,17 @@ void normalize(double *arr , int len );
 
 vector <double >  gd_train( vector <vector <double > > & train_data ,vector <double > &labels);
 
-void gradient_desecent(CMat *  train_feature , vector<double> & train_labels , vector <double >  &weights_vec  );
+//准备用c实现
+//double * gd_train_c( double ** train_data ,double * labels);
+double * gd_train_c( double ** train_data ,double * labels ,
+                    int m_train_num ,
+                     int m_features_num);
+
+void gradient_desecent(CMat *  train_feature ,
+                        vector<double> & train_labels ,
+                        vector <double >  &weights_vec  );
+void gradient_desecent_c(CMat *  train_feature ,
+                        double * train_labels ,
+                        double * weights_vec  );
 
 #endif // GRADIENT_DESCENT_H_INCLUDED

@@ -67,10 +67,14 @@ void nav_road_init(NavRoad * *nav_road_arr , NavRoadKeyNode *  *nav_key_node_arr
 
 void nav_road_create(NavRoad * nav_road_arr , NavRoadKeyNode *  nav_key_node_arr);
 
+void nav_road_release(NavRoad * nav_road_arr , NavRoadKeyNode *  nav_key_node_arr);
+
 void nav_get_node_info(NavRoad * nav_road_arr , NavRoadKeyNode *  nav_key_node_arr);
 
 //创建 一个 loc——road——arr 数组
 LocRoad * loc_road_arr_create(int n);
+
+void loc_road_arr_release(LocRoad * loc_road_arr ,int n );
 
 //为locroad 里面的 history_road  weights_arr 分配内存   2013年6月8日
 int loc_road_arr_node_malloc(LocRoad * loc_road);

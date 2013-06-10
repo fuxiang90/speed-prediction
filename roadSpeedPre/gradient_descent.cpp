@@ -110,10 +110,51 @@ void gradient_desecent(CMat *  train_feature , vector<double> & train_labels , v
     }
 
 
-//    for(int k = 0 ; k < features_num ; k ++){
-//        cout << weights_vec[k] <<" " ;
-//    }
-//    cout << "\n";
+
+}
+void gradient_desecent_c(CMat *  train_feature ,
+                        double * train_labels ,
+                        double * weights_vec  )
+{
+
+    for(int i = 0 ; i < features_num ; i ++){
+        weights_vec[i] = 1;
+    }
+    //double theta0 = 0.000000002 ; //学习速度
+
+    double  theta0 = 0.0001;
+
+    double * delta  = (double *)malloc(sizeof(double) * features_num );
+    memset(delta ,0,sizeof(double) * features_num);
+
+
+
+    for(int i = 0 ; i < train_times ; i ++) {
+
+        for(int i = 0 ; i < features_num ; i ++){
+            delta[i] = 0;
+        }
+
+        for(int j = 0 ; j < train_num ; j ++){
+            double o  = 0;
+            for(int k = 0 ; k < features_num ; k ++){
+                o += weights_vec[k]*(train_feature->data[j*features_num +k]);
+            }
+
+            //delta[0] = theta0*(train_labels[j] - o);
+            for(int k = 0 ; k < features_num ; k ++){
+                delta[k]  += theta0 *(train_labels[j] - o) *(train_feature->data[j*features_num +k]);
+            }
+        }
+
+        for(int k = 0 ; k < features_num ; k ++){
+            weights_vec[k]  += delta[k]  ;
+        }
+
+        //
+    }
+
+    free(delta);
 }
 /*
 在 train_data  会加一个1
@@ -143,8 +184,36 @@ vector <double >  gd_train( vector <vector <double > > & train_data ,vector <dou
     gradient_desecent(train_feature ,labels ,weights_vec);
 
 
-
+    CMatRelease(train_feature);//bug  2013年6月10日
     return  weights_vec;
 
+}
+double * gd_train_c( double ** train_data ,double * labels , int m_train_num , int m_features_num)
+{
+    train_num = m_train_num;
+    features_num = m_features_num+ 1;
+
+    train_times = 1000;
+
+    double  * weights_vec  = (double * ) malloc(sizeof(double ) * features_num) ;;
+    CMat * train_feature = CMatCreate(train_num ,features_num);
+
+    for(int i = 0 ; i < train_num ; ++i){
+
+        train_feature->data[i*features_num ] = 1;
+        for(int j = 1 ; j < features_num ; ++j){
+
+            train_feature->data[i*features_num + j]  = train_data[i][j-1];
+        }
+    }
+
+    //gaussian(train_feature);
+    gaussian2(train_feature);
+
+    gradient_desecent_c(train_feature ,labels ,weights_vec);
+
+
+    CMatRelease(train_feature);//bug  2013年6月10日
+    return  weights_vec;
 }
 

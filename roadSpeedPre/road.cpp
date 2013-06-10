@@ -81,7 +81,14 @@ void nav_road_create(NavRoad * nav_road_arr , NavRoadKeyNode *  nav_key_node_arr
     return ;
 
 }
+void nav_road_release(NavRoad * nav_road_arr , NavRoadKeyNode *  nav_key_node_arr)
+{
 
+    free(nav_road_arr);
+    nav_road_arr = NULL;
+    free(nav_key_node_arr);
+    nav_key_node_arr = NULL;
+}
 LocRoad * loc_road_arr_create(int n)
 {
     //LocRoad * arr = (LocRoad *)malloc(sizeof(LocRoad) * n);
@@ -97,29 +104,49 @@ LocRoad * loc_road_arr_create(int n)
 	}
 	return arr;
 }
+void loc_road_arr_release(LocRoad * loc_road_arr,int n )
+{
+    for(int i = 0 ; i < n ; i ++){
+
+        loc_road_arr_node_free(&loc_road_arr[i]);
+
+    }
+    delete [] loc_road_arr;
+
+}
 int loc_road_arr_node_malloc(LocRoad * loc_road)
 {
     loc_road->history_road = (double ** )malloc(sizeof(double *) * 7);
 
+    assert( loc_road->history_road);
+
     for(int i = 0 ; i < 7 ; i ++){
         loc_road->history_road[i] = (double *) malloc(sizeof( double ) * TIMES_DAY);
+        assert(loc_road->history_road[i]);
+
         memset(loc_road->history_road[i] ,0 ,sizeof( double ) * TIMES_DAY) ;//win 下 一定要初始化
-    }
+       }
 
-     loc_road->weights_arr = (double ** )malloc(sizeof(double *) * 7);
-
-     for(int i = 0 ; i < 7 ; i ++){
+    loc_road->weights_arr = (double ** )malloc(sizeof(double *) * 7);
+    assert(loc_road->weights_arr);
+    for(int i = 0 ; i < 7 ; i ++){
         loc_road->weights_arr[i] = (double *) malloc(sizeof( double ) * 5);
 
+        assert(loc_road->weights_arr[i]);
         memset(loc_road->weights_arr[i] , 0,sizeof(double )*5);
+
+
     }
 
 
 
-     loc_road->road_times_arr = (int ** )malloc(sizeof(int *) * 7);
-
-     for(int i = 0 ; i < 7 ; i ++){
+    loc_road->road_times_arr = (int ** )malloc(sizeof(int *) * 7);
+     //bug valgrind
+    assert(loc_road->road_times_arr);
+    for(int i = 0 ; i < 7 ; i ++){
         loc_road->road_times_arr[i] = (int *) malloc(sizeof( int ) * TIMES_DAY);
+
+        assert(loc_road->road_times_arr[i]);
         memset(loc_road->road_times_arr[i] , 0,sizeof(int)*TIMES_DAY);
     }
 
@@ -128,18 +155,23 @@ int loc_road_arr_node_malloc(LocRoad * loc_road)
 }
 int loc_road_arr_node_free(LocRoad * loc_road)
 {
-    for(int i = 0 ; i < 7 ; i ++){
-        free(loc_road->history_road[i] );
+    if(loc_road ->history_road ){
+        for(int i = 0 ; i < 7 ; i ++){
+            //if(loc_road->history_road[i])
+            free(loc_road->history_road[i] );
+        }
+        free(loc_road->history_road);
+        loc_road->history_road = NULL;
     }
-    free(loc_road->history_road);
-    loc_road->history_road = NULL;
 
-    for(int i = 0 ; i < 7 ; i ++){
-        free(loc_road->weights_arr[i] );
-
+    if(loc_road -> weights_arr){
+       for(int i = 0 ; i < 7 ; i ++){
+            free(loc_road->weights_arr[i] );
+        }
+        free(loc_road->weights_arr);
+        loc_road->weights_arr = NULL;
     }
-    free(loc_road->weights_arr);
-    loc_road->weights_arr = NULL;
+
 
     if(loc_road->road_times_arr != NULL){
          for(int i = 0 ; i < 7 ; i ++){
@@ -198,11 +230,16 @@ void get_locid_seq( LocRoad * loc_road_arr , NavRoad *nav_road_arr )
 {
     FILE * fin = fopen(LOCID_SEQ_FILE ,"r");
 
+    if(fin ==NULL){
+        fprintf(stdout,"%s\n",LOCID_SEQ_FILE);
+    }
     char * loc_str = (char *)malloc(50);
     char * loc_int_str = (char *)malloc(50);
 
     int  loc_road_pos  = 0;
     int road_seq;
+    //
+
     while(fscanf(fin,"%s %d",loc_str ,&road_seq ) != EOF) {
 
         int len = strlen(loc_str);
@@ -224,7 +261,7 @@ void get_locid_seq( LocRoad * loc_road_arr , NavRoad *nav_road_arr )
             loc_road_arr[loc_road_pos].locid = locid;
         }
 
-        loc_road_arr[loc_road_pos].road_seq_vec.push_back(road_seq);
+        loc_road_arr[loc_road_pos].road_seq_vec.push_back(road_seq); //valgrind 2013年6月10日
 
         //2013年6月8日
         loc_road_arr_node_malloc(&loc_road_arr[loc_road_pos]);

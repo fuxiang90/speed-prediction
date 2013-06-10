@@ -77,7 +77,8 @@ void RoadInfoShow(RoadInfo * head,char *out_name);
 
 
 
-void getInfoStr(char * in_str ,RoadInfo * head,struct date_t * now_time, struct  LocRoad_t * loc_road );
+void getInfoStr(char * in_str ,RoadInfo * head,struct date_t * now_time,
+                struct  LocRoad_t * loc_road );
 void getInfoStr(char * in_str ,RoadInfo * head,struct date_t * mtime   );
 
 /*test*/

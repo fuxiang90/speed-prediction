@@ -32,6 +32,12 @@ RoadInfo * predict_roadinfo_create()
     return road_info_arr;
 
 }
+void  predict_roadinfo_release(RoadInfo *road_info_arr)
+{
+    free(road_info_arr);
+    road_info_arr = NULL;
+
+}
 void get_road_info(RoadInfo * road_info_arr)
 {
 
@@ -60,10 +66,16 @@ void get_road_info(RoadInfo * road_info_arr)
 int get_road_info_filename(RoadInfo * head , char *filename  ,  LocRoad * loc_road_arr ,int loc_pos)
 {
     char in_str[MAX_STRLEN];
-    struct date_t  now_time;
+    struct date_t  now_time;//valgrind 提示的bug  需要初始化
+    //
+    now_time.year = 2000;
+    now_time.mouth = 1;
+    now_time.day = 1;
+
+
     FILE * file_p = fopen(filename ,"r");
     if(file_p == NULL) {
-        fprintf(stdout,"%s open error\n",filename);
+        //fprintf(stdout,"%s open error\n",filename);
         return 0;
     }
     //读取文件内容
@@ -504,7 +516,8 @@ void schedule_train_loc_road(int * schedule_arr  ,int n, LocRoad * loc_road_arr 
 {
     char filename[MAX_FILE_NAME_LEN];
 
-    char *file_name =  (char *)malloc(sizeof(char) * MAX_FILE_NAME_LEN);
+    char *file_name =  (char *)malloc(sizeof(char) * MAX_FILE_NAME_LEN );
+    assert(file_name );
     for(int i = 0 ; i < n ; i ++) {
 
         int locid = schedule_arr[i];
@@ -512,7 +525,8 @@ void schedule_train_loc_road(int * schedule_arr  ,int n, LocRoad * loc_road_arr 
 
         get_filename(locid,filename);
 
-        sprintf(file_name ,"%s%s",txt_root_path ,filename);
+        //sprintf(file_name ,"%s%s",txt_root_path ,filename);
+        snprintf(file_name ,MAX_FILE_NAME_LEN ,"%s%s",txt_root_path ,filename);
 
         //
         if ( 0 != get_road_info_filename( &road_info_arr[loc_pos] ,file_name , loc_road_arr ,loc_pos) ) {
@@ -531,7 +545,8 @@ void schedule_train_loc_road(int * schedule_arr  ,int n, LocRoad * loc_road_arr 
         int pre_locid = loc_road_arr[loc_pos].pre_locid;
         int pre_loc_pos = locid_hash[pre_locid];
         if(road_info_arr[pre_loc_pos].flag == 1 ) {
-            train_loc_road(locid ,pre_locid ,road_info_arr,loc_road_arr );
+            train_loc_road_c(locid ,pre_locid ,road_info_arr,loc_road_arr );
+//            train_loc_road(locid ,pre_locid ,road_info_arr,loc_road_arr );
         }
 
         loc_road_arr_node_free_road_times(&loc_road_arr[loc_pos]);
@@ -546,12 +561,17 @@ void schedule_train_loc_road(int * schedule_arr  ,int n, LocRoad * loc_road_arr 
 
 void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad * loc_road_arr)
 {
+    //这个是暂时没有bug
     int locpos = locid_hash[locid];
-   // int pre_locpos = locid_hash[locid];// bug 2013年6月9日
     int pre_locpos = locid_hash[pre_locid];
+    //add 2013年6月10日
+    if(road_info_arr[pre_locpos].flag != 1 ){
+        fprintf(stdout,"train_loc_road : pre_locpos no history\n");
+        return ;
+    }
 
     RoadInfo * road_info = &(road_info_arr[locpos]);
-    LocRoad  * pre_road = &loc_road_arr[pre_locpos];
+    LocRoad  * pre_road = &(loc_road_arr[pre_locpos]);
 
 
 
@@ -568,16 +588,10 @@ void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad 
     int roadid = road_info->road_id;
 
 
-//    vector < vector <double > > train_data[7];
-    vector < vector < vector <double > >  >train_data(7);
+    vector < vector <double > > train_data[7];
     vector<double > data ;
     vector<double > label[7];
     data.resize(4);
-    if(now_l_head == NULL)
-        return ;
-
-    //debug
-    int debug_i = 0;
     while(now_l_head ) {
 
         int weekday = ((struct road_t*) (now_l_head->value))->weekday;
@@ -618,14 +632,6 @@ void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad 
             data[2] = next_preroad_histroy_speed;
             data[3] = next_thisroad_histroy_speed;
 
-            //debug
-            //printf("%d\n",weekday);
-            if(debug_i == 20000){
-                debug_i ++;
-                debug_i --;
-            }
-            debug_i ++;
-
             train_data[weekday].push_back(data);
             label[weekday].push_back(next_thisroad_speed);
 
@@ -636,7 +642,7 @@ void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad 
 
     //store data
     char * train_file_name = (char *)malloc(20);
-    sprintf(train_file_name,"./data/train/%d_data",roadid);
+    sprintf(train_file_name,"./data/%d_data",roadid);
     FILE * fout = fopen(train_file_name,"w");
     for(int i = 0 ; i <= 6 ; i ++) {
         double w ;
@@ -677,11 +683,15 @@ void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad 
 void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad * loc_road_arr)
 {
     int locpos = locid_hash[locid];
-   // int pre_locpos = locid_hash[locid];// bug 2013年6月9日
     int pre_locpos = locid_hash[pre_locid];
+    //add 2013年6月10日
+    if(road_info_arr[pre_locpos].flag != 1 ){
+        fprintf(stdout,"train_loc_road : pre_locpos no history\n");
+        return ;
+    }
 
     RoadInfo * road_info = &(road_info_arr[locpos]);
-    LocRoad  * pre_road = &loc_road_arr[pre_locpos];
+    LocRoad  * pre_road = &(loc_road_arr[pre_locpos]);
 
 
 
@@ -698,16 +708,46 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
     int roadid = road_info->road_id;
 
 
-//    vector < vector <double > > train_data[7];
-    vector < vector < vector <double > >  >train_data(7);
-    vector<double > data ;
-    vector<double > label[7];
-    data.resize(4);
-    if(now_l_head == NULL)
-        return ;
+    double * *  train_data[7];
+    double data[4] ;
+    double * label[7];
 
-    //debug
-    int debug_i = 0;
+    int weekday_num[7] = {0};
+
+    while(now_l_head ) {
+        int weekday = ((struct road_t*) (now_l_head->value))->weekday;
+        weekday_num[weekday] += TIMES_DAY ;
+        now_l_head = now_l_head->next;
+    }//end while
+    //train_data = (double ***)malloc(sizeof(double ** ) * 7);
+    for(int i = 0 ; i < 7 ; i++){
+        train_data[i] = (double * * )malloc(sizeof(double *) *weekday_num[i] );
+        assert(train_data[i]);
+        if(train_data[i] == NULL){
+            printf("train_data[i] memory error\n");
+        }
+        for(int j = 0 ; j < weekday_num[i] ;j ++ ){
+            //train_data[i][j]  = (double *)malloc(sizeof(double) * 4 );
+            train_data[i][j]  = (double *)calloc(4 ,sizeof(double)  );
+            assert(train_data[i][j]);
+            if(train_data[i][j] == NULL){
+                printf("train_data[i][j] memory error\n");
+            }
+        }
+    }
+    for(int i = 0 ; i < 7 ; i++){
+        //label[i] = (double *  )malloc(sizeof(double ) *weekday_num[i] );
+        label[i] = (double *  )calloc(weekday_num[i] ,sizeof(double )  );
+        assert(label[i]);
+        if(label[i] == NULL){
+            printf("label[i] memory error\n");
+        }
+
+    }
+
+
+    int weekday_pos[7] = {0};
+    now_l_head = road_info->road_list->head;
     while(now_l_head ) {
 
         int weekday = ((struct road_t*) (now_l_head->value))->weekday;
@@ -743,21 +783,16 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
 //                    roadid , weekday ,now_thisroad_speed ,now_preroad_histroy_speed ,next_preroad_histroy_speed ,
 //                    next_thisroad_histroy_speed,next_thisroad_speed);
 
-            data[0] = now_thisroad_speed ;
-            data[1] = now_preroad_histroy_speed ;
-            data[2] = next_preroad_histroy_speed;
-            data[3] = next_thisroad_histroy_speed;
+            int pos = weekday_pos[weekday];
+            train_data[weekday][ pos ] [0] = now_thisroad_speed ;
+            train_data[weekday][ pos ] [1] = now_preroad_histroy_speed ;
+            train_data[weekday][ pos ] [2] = next_preroad_histroy_speed ;
+            train_data[weekday][ pos ] [3] = next_thisroad_histroy_speed ;
 
-            //debug
-            //printf("%d\n",weekday);
-            if(debug_i == 20000){
-                debug_i ++;
-                debug_i --;
-            }
-            debug_i ++;
+            label[weekday][ pos ] = next_thisroad_speed;
 
-            train_data[weekday].push_back(data);
-            label[weekday].push_back(next_thisroad_speed);
+
+             weekday_pos[weekday] ++;
 
 
         }
@@ -765,19 +800,20 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
     }//end while
 
     //store data
-    char * train_file_name = (char *)malloc(20);
-    sprintf(train_file_name,"./data/train/%d_data",roadid);
+    char * train_file_name = (char *)malloc(MAX_FILE_NAME_LEN);
+    //sprintf(train_file_name,"./data/train/%d_data",roadid);//bug 2013年6月10日
+    snprintf(train_file_name,MAX_FILE_NAME_LEN,"./data/train/%d_data",roadid);
     FILE * fout = fopen(train_file_name,"w");
     for(int i = 0 ; i <= 6 ; i ++) {
         double w ;
 
 
-        for(int k = 0 ; k < train_data[i].size() ; k ++) {
+        for(int k = 0 ; k < weekday_num[i] ; k ++) {
             for(int j = 0 ; j < 4 ; j++) {
                 w = (train_data[i][k][j]);
                 fprintf(fout,"%lf " ,w);
             }
-            if(k +1 == train_data[i].size() ) {
+            if(k +1 == weekday_num[i]  ) {
                 w = train_data[i][k][0];
                 fprintf(fout ,"%lf", w);
             } else {
@@ -792,16 +828,37 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
 
 
     //最后训练的权值 要保存在 loc 里面
+
     for(int i = 0 ; i <= 6 ; i ++) {
-        vector<double > w = gd_train(train_data[i] ,label[i]);
+
+        double * w = gd_train_c(train_data[i] ,label[i],weekday_num[i],4);
 
         int locid = road_info->road_id ;
         int loc_pos = locid_hash[locid];
 
-        for(int j = 0 ; j < w.size() ; j++)
+        for(int j = 0 ; j < 4 ; j++)
             loc_road_arr[loc_pos].weights_arr[i][j] = w[j];
 
+        free(w);
+
     }
+
+    //2013年6月10日
+     for(int i = 0 ; i < 7 ; i++){
+        for(int j = 0 ; j < weekday_num[i] ;j ++ ){
+            free(train_data[i][j]) ;
+            train_data[i][j] = NULL;
+
+        }
+        free(train_data[i]);
+        train_data[i] = NULL;
+    }
+    for(int i = 0 ; i < 7 ; i++){
+
+        free(label[i]);
+        label[i] = NULL;
+    }
+
 
 }
 
@@ -910,8 +967,8 @@ void predict_schedule_main()
 
     set_graph_info( graph ,loc_road_arr);
 
-    int * schedule_arr ;
-    int n;
+    int * schedule_arr = NULL; // 2013年6月10日 int * schedule_arr ；
+    int n = 0;//2013年6月10日
 
     graph_topo_sort(&schedule_arr  , &n ,graph);
 
@@ -921,14 +978,23 @@ void predict_schedule_main()
     //copy_history_roadinfo_locroad(road_info_arr ,loc_road_arr );
 
 
-    free(road_info_arr);
+    //free(road_info_arr);
+
+    predict_roadinfo_release(road_info_arr);
 
 
-
+    nav_road_release(nav_road_arr ,nav_key_node_arr);//add 2013年6月10日
     // for test
+
+
     predict_test(loc_road_arr);
 
 
     store_loc_in_file(loc_road_arr);
+
+
+    // free 内存
+    loc_road_arr_release(loc_road_arr ,MAX_LOC_ROAD);
+
 
 }

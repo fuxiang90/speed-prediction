@@ -39,6 +39,8 @@ using namespace std;
 */
 RoadInfo * predict_roadinfo_create();
 
+void  predict_roadinfo_release(RoadInfo *road_info_arr);
+
 void predict_init();
 
 void get_road_info(RoadInfo * road_info_arr);
