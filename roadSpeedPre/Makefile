@@ -27,5 +27,5 @@ schedule.o:config.h road.h
 
 .PHONY : clean
 clean:
-	rm main $(objects)
+	-rm main $(objects)
 
