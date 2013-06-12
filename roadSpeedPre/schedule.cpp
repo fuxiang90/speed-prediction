@@ -22,6 +22,11 @@ ScheduleGraph * graph_init()
     return graph;
 
 }
+void graph_release(ScheduleGraph * graph)
+{
+    free(graph);
+    graph = NULL;
+}
 void set_graph_info(ScheduleGraph * graph ,LocRoad * loc_road_arr)
 {
     for(int i = 1 ; i < MAX_LOC_ROAD ; i++){

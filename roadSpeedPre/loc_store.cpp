@@ -10,12 +10,13 @@ void store_loc_in_file( LocRoad * loc_road_arr  )
         fprintf(stdout ,"%s open error\n",txt_loc_store_path);
         exit(0);
     }
+
     for(int i = 1 ; i < MAX_LOC_ROAD ; i++){
         int locid = loc_road_arr[i].locid;
         int pre_locid = loc_road_arr[i].pre_locid;
 
         if(locid == 0) continue;
-
+        if(loc_road_arr[i].flag != 1) continue;
         fprintf(fout,"%d %d %d \n",i ,locid ,pre_locid);
 
         for(int j = 0 ; j < 7 ; j ++){

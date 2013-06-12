@@ -28,6 +28,8 @@ typedef struct ScheduleGraph_t ScheduleGraph;
 
 ScheduleGraph * graph_init();
 
+void graph_release(ScheduleGraph * graph) ;
+
 
 void set_graph_info(ScheduleGraph * graph ,LocRoad * loc_road_arr);
 void graph_topo_sort(int * * schedule_arr  ,int *n , ScheduleGraph * graph  );

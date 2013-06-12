@@ -78,6 +78,8 @@ int get_road_info_filename(RoadInfo * head , char *filename  ,  LocRoad * loc_ro
         //fprintf(stdout,"%s open error\n",filename);
         return 0;
     }
+
+    loc_road_arr_node_malloc(&loc_road_arr[loc_pos]);//2013年6月11日 懒惰的申请内存，当需要用的时候
     //读取文件内容
     while(fgets(in_str,MAX_STRLEN ,file_p)) {
 
@@ -528,6 +530,7 @@ void schedule_train_loc_road(int * schedule_arr  ,int n, LocRoad * loc_road_arr 
         //sprintf(file_name ,"%s%s",txt_root_path ,filename);
         snprintf(file_name ,MAX_FILE_NAME_LEN ,"%s%s",txt_root_path ,filename);
 
+        //loc_road_arr_node_malloc(&loc_road_arr[loc_road_pos]) ;
         //
         if ( 0 != get_road_info_filename( &road_info_arr[loc_pos] ,file_name , loc_road_arr ,loc_pos) ) {
 
@@ -538,6 +541,10 @@ void schedule_train_loc_road(int * schedule_arr  ,int n, LocRoad * loc_road_arr 
 
             loc_road_arr[loc_pos].flag = 1;
         } else {
+
+            loc_road_arr_node_free_road_times(&loc_road_arr[loc_pos]);
+            RoadInfoClistRealease(&road_info_arr[loc_pos]);// add
+
             continue;
         }
 
@@ -859,7 +866,7 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
         label[i] = NULL;
     }
 
-
+    free(train_file_name);//bug valgrind 2013年6月11日
 }
 
 int history_train_loc_road(double *  *speed_arr  ,LocRoad * loc_road_arr ,
@@ -984,10 +991,16 @@ void predict_schedule_main()
 
 
     nav_road_release(nav_road_arr ,nav_key_node_arr);//add 2013年6月10日
+
+
+    free(schedule_arr);// add valgrind 2013年6月11日
+    schedule_arr = NULL;
+
+    graph_release(graph);
     // for test
 
 
-    predict_test(loc_road_arr);
+    //predict_test(loc_road_arr);
 
 
     store_loc_in_file(loc_road_arr);

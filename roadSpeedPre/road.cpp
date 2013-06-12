@@ -155,18 +155,30 @@ int loc_road_arr_node_malloc(LocRoad * loc_road)
 }
 int loc_road_arr_node_free(LocRoad * loc_road)
 {
+
+    //debug
+    static int debug_history_road_times = 0;
+
     if(loc_road ->history_road ){
         for(int i = 0 ; i < 7 ; i ++){
             //if(loc_road->history_road[i])
             free(loc_road->history_road[i] );
+
+            //debug
+            debug_history_road_times ++;
         }
         free(loc_road->history_road);
         loc_road->history_road = NULL;
     }
 
+    //debug
+    static int debug_weights_arr_times = 0;
+
     if(loc_road -> weights_arr){
        for(int i = 0 ; i < 7 ; i ++){
             free(loc_road->weights_arr[i] );
+            //debug
+            debug_weights_arr_times ++;
         }
         free(loc_road->weights_arr);
         loc_road->weights_arr = NULL;
@@ -181,15 +193,21 @@ int loc_road_arr_node_free(LocRoad * loc_road)
         free(loc_road->road_times_arr);
         loc_road->road_times_arr = NULL;
     }
+
+    //debug
+    //printf("%d %d \n",debug_history_road_times ,debug_weights_arr_times);
+
     return 1;
 }
 
 int loc_road_arr_node_free_road_times(LocRoad * loc_road)
 {
-    if(loc_road == NULL)
+    if(loc_road == NULL || loc_road->road_times_arr == NULL)
         return 0;
+
     for(int i = 0 ; i < 7 ; i ++){
-        free(loc_road->road_times_arr[i] );
+        if(loc_road->road_times_arr[i])
+            free(loc_road->road_times_arr[i] );
 
     }
     free(loc_road->road_times_arr);
@@ -264,7 +282,10 @@ void get_locid_seq( LocRoad * loc_road_arr , NavRoad *nav_road_arr )
         loc_road_arr[loc_road_pos].road_seq_vec.push_back(road_seq); //valgrind 2013年6月10日
 
         //2013年6月8日
-        loc_road_arr_node_malloc(&loc_road_arr[loc_road_pos]);
+        //这里还是等于为每一个loc road 分配了空间 ， 有些不需要 放到schedule_train_loc_road 更好
+        //loc_road_arr_node_malloc(&loc_road_arr[loc_road_pos]); 2013年6月11日
+
+
         nav_road_arr[road_seq].locid = locid;
     }
 

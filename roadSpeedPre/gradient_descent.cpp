@@ -112,6 +112,7 @@ void gradient_desecent(CMat *  train_feature , vector<double> & train_labels , v
 
 
 }
+//这个算法要改成自适应的 ，不然还得哦去调 theta
 void gradient_desecent_c(CMat *  train_feature ,
                         double * train_labels ,
                         double * weights_vec  )
@@ -122,7 +123,7 @@ void gradient_desecent_c(CMat *  train_feature ,
     }
     //double theta0 = 0.000000002 ; //学习速度
 
-    double  theta0 = 0.0001;
+    double  theta0 = 0.000005;
 
     double * delta  = (double *)malloc(sizeof(double) * features_num );
     memset(delta ,0,sizeof(double) * features_num);
@@ -195,7 +196,8 @@ double * gd_train_c( double ** train_data ,double * labels , int m_train_num , i
 
     train_times = 1000;
 
-    double  * weights_vec  = (double * ) malloc(sizeof(double ) * features_num) ;;
+    double  * weights_vec  = (double * ) malloc(sizeof(double ) * features_num) ;
+    memset(weights_vec ,0,sizeof(double )* features_num);
     CMat * train_feature = CMatCreate(train_num ,features_num);
 
     for(int i = 0 ; i < train_num ; ++i){
