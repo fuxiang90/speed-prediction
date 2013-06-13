@@ -21,10 +21,13 @@
 #if OS_LINUX
 #include <dirent.h>
 #include <sys/stat.h>
+#else
+
+#define snprintf _snprintf
 #endif
 
 #define  MAX_OUT_ROAD 6
-#define  MAX_FILE_NAME_LEN 30
+#define  MAX_FILE_NAME_LEN 50
 #define  MAX_TXT_NAME_LEN 20
 
 

@@ -101,6 +101,11 @@ LocRoad * loc_road_arr_create(int n)
 		arr[i].locid = 0;
 		arr[i].pre_locid = 0;
 		arr[i].flag = 0;
+
+		//2013年6月13日
+        arr[i].road_times_arr = NULL;
+		arr[i].weights_arr = NULL;
+		arr[i].history_road = NULL;
 	}
 	return arr;
 }

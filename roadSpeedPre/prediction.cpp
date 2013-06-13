@@ -472,7 +472,7 @@ void check_train_loc_road(LocRoad * loc_road_arr )
     FILE * fin = fopen("./data/txt/376_0.txt","r");
 
     char in_str[MAX_STRLEN];
-    struct date_t  now_time;
+    //struct date_t  now_time;
     if(fin == NULL) {
         printf("./data/txt/39_0.txt open error\n");
         return ;
@@ -558,6 +558,14 @@ void schedule_train_loc_road(int * schedule_arr  ,int n, LocRoad * loc_road_arr 
 
         loc_road_arr_node_free_road_times(&loc_road_arr[loc_pos]);
         RoadInfoClistRealease(&road_info_arr[loc_pos]);
+
+        //debug
+		static int debug_pos = 0;
+		if(debug_pos % 100 == 0){
+			printf("%d\n",debug_pos);
+		}
+		debug_pos ++;
+		//end debug
 
 
     }
@@ -648,6 +656,7 @@ void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad 
     }//end while
 
     //store data
+    //debug
     char * train_file_name = (char *)malloc(20);
     sprintf(train_file_name,"./data/%d_data",roadid);
     FILE * fout = fopen(train_file_name,"w");
@@ -655,7 +664,7 @@ void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad 
         double w ;
 
 
-        for(int k = 0 ; k < train_data[i].size() ; k ++) {
+        for(unsigned int k = 0 ; k < train_data[i].size() ; k ++) {
             for(int j = 0 ; j < 4 ; j++) {
                 w = (train_data[i][k][j]);
                 fprintf(fout,"%lf " ,w);
@@ -681,7 +690,7 @@ void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad 
         int locid = road_info->road_id ;
         int loc_pos = locid_hash[locid];
 
-        for(int j = 0 ; j < w.size() ; j++)
+        for(unsigned int j = 0 ; j < w.size() ; j++)
             loc_road_arr[loc_pos].weights_arr[i][j] = w[j];
 
     }
@@ -712,11 +721,11 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
 
 
     double next_thisroad_speed          = 0.0;
-    int roadid = road_info->road_id;
+//    int roadid = road_info->road_id;
 
 
     double * *  train_data[7];
-    double data[4] ;
+//    double data[4] ;
     double * label[7];
 
     int weekday_num[7] = {0};
@@ -806,32 +815,33 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
         now_l_head = now_l_head->next;
     }//end while
 
-    //store data
-    char * train_file_name = (char *)malloc(MAX_FILE_NAME_LEN);
-    //sprintf(train_file_name,"./data/train/%d_data",roadid);//bug 2013年6月10日
-    snprintf(train_file_name,MAX_FILE_NAME_LEN,"./data/train/%d_data",roadid);
-    FILE * fout = fopen(train_file_name,"w");
-    for(int i = 0 ; i <= 6 ; i ++) {
-        double w ;
-
-
-        for(int k = 0 ; k < weekday_num[i] ; k ++) {
-            for(int j = 0 ; j < 4 ; j++) {
-                w = (train_data[i][k][j]);
-                fprintf(fout,"%lf " ,w);
-            }
-            if(k +1 == weekday_num[i]  ) {
-                w = train_data[i][k][0];
-                fprintf(fout ,"%lf", w);
-            } else {
-                w = train_data[i][k+1][0];
-                fprintf(fout ,"%lf", w);
-            }
-            fprintf(fout ,"\n");
-        }
-    }
-    fclose(fout);
-    /////
+    //store data  可以不要
+//    char * train_file_name = (char *)malloc(MAX_FILE_NAME_LEN);
+//    //sprintf(train_file_name,"./data/train/%d_data",roadid);//bug 2013年6月10日
+//    snprintf(train_file_name,MAX_FILE_NAME_LEN,"./data/train/%d_data",roadid);
+//    FILE * fout = fopen(train_file_name,"w");
+//    for(int i = 0 ; i <= 6 ; i ++) {
+//        double w ;
+//
+//
+//        for(int k = 0 ; k < weekday_num[i] ; k ++) {
+//            for(int j = 0 ; j < 4 ; j++) {
+//                w = (train_data[i][k][j]);
+//                fprintf(fout,"%lf " ,w);
+//            }
+//            if(k +1 == weekday_num[i]  ) {
+//                w = train_data[i][k][0];
+//                fprintf(fout ,"%lf", w);
+//            } else {
+//                w = train_data[i][k+1][0];
+//                fprintf(fout ,"%lf", w);
+//            }
+//            fprintf(fout ,"\n");
+//        }
+//    }
+//    fclose(fout);
+//    free(train_file_name);//bug valgrind 2013年6月11日
+    //end store
 
 
     //最后训练的权值 要保存在 loc 里面
@@ -866,7 +876,7 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
         label[i] = NULL;
     }
 
-    free(train_file_name);//bug valgrind 2013年6月11日
+
 }
 
 int history_train_loc_road(double *  *speed_arr  ,LocRoad * loc_road_arr ,

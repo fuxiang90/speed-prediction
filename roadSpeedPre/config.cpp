@@ -15,7 +15,9 @@ const char * NAV_ROAD_FILE = "./data/map_txt/nav-roadid.txt" ;
 const char * LOCID_SEQ_FILE = "data/map_txt/locid_seq.txt";
 
 
-const char * txt_root_path = "./data/txt/";
+//const char * txt_root_path = "./data/txt/";
+//const char * txt_root_path = "../txt/"; //如果测试可以选择使用这个
+const char * txt_root_path = "/media/linuxdata/newcom/data/txt/";
 
 //储存有python生成的环信息
 const char * txt_cycle_path = "./data/info/cycles.txt" ;
