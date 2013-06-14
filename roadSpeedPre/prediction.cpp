@@ -560,12 +560,12 @@ void schedule_train_loc_road(int * schedule_arr  ,int n, LocRoad * loc_road_arr 
         RoadInfoClistRealease(&road_info_arr[loc_pos]);
 
         //debug
-		static int debug_pos = 0;
-		if(debug_pos % 100 == 0){
-			printf("%d\n",debug_pos);
-		}
-		debug_pos ++;
-		//end debug
+        static int debug_pos = 0;
+        if(debug_pos % 100 == 0) {
+            printf("%d\n",debug_pos);
+        }
+        debug_pos ++;
+        //end debug
 
 
     }
@@ -580,7 +580,7 @@ void train_loc_road(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoad 
     int locpos = locid_hash[locid];
     int pre_locpos = locid_hash[pre_locid];
     //add 2013年6月10日
-    if(road_info_arr[pre_locpos].flag != 1 ){
+    if(road_info_arr[pre_locpos].flag != 1 ) {
         fprintf(stdout,"train_loc_road : pre_locpos no history\n");
         return ;
     }
@@ -701,7 +701,7 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
     int locpos = locid_hash[locid];
     int pre_locpos = locid_hash[pre_locid];
     //add 2013年6月10日
-    if(road_info_arr[pre_locpos].flag != 1 ){
+    if(road_info_arr[pre_locpos].flag != 1 ) {
         fprintf(stdout,"train_loc_road : pre_locpos no history\n");
         return ;
     }
@@ -736,26 +736,26 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
         now_l_head = now_l_head->next;
     }//end while
     //train_data = (double ***)malloc(sizeof(double ** ) * 7);
-    for(int i = 0 ; i < 7 ; i++){
+    for(int i = 0 ; i < 7 ; i++) {
         train_data[i] = (double * * )malloc(sizeof(double *) *weekday_num[i] );
         assert(train_data[i]);
-        if(train_data[i] == NULL){
+        if(train_data[i] == NULL) {
             printf("train_data[i] memory error\n");
         }
-        for(int j = 0 ; j < weekday_num[i] ;j ++ ){
+        for(int j = 0 ; j < weekday_num[i] ; j ++ ) {
             //train_data[i][j]  = (double *)malloc(sizeof(double) * 4 );
             train_data[i][j]  = (double *)calloc(4 ,sizeof(double)  );
             assert(train_data[i][j]);
-            if(train_data[i][j] == NULL){
+            if(train_data[i][j] == NULL) {
                 printf("train_data[i][j] memory error\n");
             }
         }
     }
-    for(int i = 0 ; i < 7 ; i++){
+    for(int i = 0 ; i < 7 ; i++) {
         //label[i] = (double *  )malloc(sizeof(double ) *weekday_num[i] );
         label[i] = (double *  )calloc(weekday_num[i] ,sizeof(double )  );
         assert(label[i]);
-        if(label[i] == NULL){
+        if(label[i] == NULL) {
             printf("label[i] memory error\n");
         }
 
@@ -808,7 +808,7 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
             label[weekday][ pos ] = next_thisroad_speed;
 
 
-             weekday_pos[weekday] ++;
+            weekday_pos[weekday] ++;
 
 
         }
@@ -861,8 +861,8 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
     }
 
     //2013年6月10日
-     for(int i = 0 ; i < 7 ; i++){
-        for(int j = 0 ; j < weekday_num[i] ;j ++ ){
+    for(int i = 0 ; i < 7 ; i++) {
+        for(int j = 0 ; j < weekday_num[i] ; j ++ ) {
             free(train_data[i][j]) ;
             train_data[i][j] = NULL;
 
@@ -870,7 +870,7 @@ void train_loc_road_c(int locid ,int pre_locid , RoadInfo  *road_info_arr,LocRoa
         free(train_data[i]);
         train_data[i] = NULL;
     }
-    for(int i = 0 ; i < 7 ; i++){
+    for(int i = 0 ; i < 7 ; i++) {
 
         free(label[i]);
         label[i] = NULL;
@@ -941,6 +941,51 @@ void predict_test(LocRoad * loc_road_arr)
         printf("输入 星期 小时 分钟 当前速度 ，道路id ，预测时间\n ");
     }
 }
+void predict_check(LocRoad * loc_road_arr)
+{
+    int weekday ;
+    int h;
+    int  m;
+    double now_speed;
+    int locid;
+    int times;
+
+    for(int i = 1 ; i < MAX_LOC_ROAD ; i++) {
+
+        if(loc_road_arr[i].flag != 1) continue;
+        for(int j = 1 ; j < 10 ; j ++) {
+
+            weekday = j%7;
+            h = 10;
+            m = 10;
+            now_speed = 20.0;
+            locid = loc_road_arr[i].locid;
+            times = 30;
+            printf("========history_train_loc_road===============\n");
+            double * speed_arr;
+            int speed_arr_len = history_train_loc_road( &speed_arr ,loc_road_arr ,weekday ,h ,m  ,locid ,times);
+
+            for(int i = 0 ; i < speed_arr_len ; i ++) {
+                printf("%lf\n" , speed_arr[i]);
+            }
+            free(speed_arr);
+
+
+            ////
+            printf("========prediction_train_loc_road===============\n");
+            speed_arr_len = prediction_train_loc_road( &speed_arr ,loc_road_arr ,weekday ,h ,m  ,now_speed,locid ,times);
+
+            for(int i = 0 ; i < speed_arr_len ; i ++) {
+                printf("%lf\n" , speed_arr[i]);
+            }
+            free(speed_arr);
+
+
+        }
+
+    }
+
+}
 void predict_main()
 {
 
@@ -954,11 +999,13 @@ void predict_main()
 
 
     // for test
-    predict_test(loc_road_arr);
+    //predict_test(loc_road_arr);
+
+    //批量测试
+    predict_check(loc_road_arr);
 
 
-
-
+    loc_road_arr_release(loc_road_arr,MAX_LOC_ROAD);
 }
 void predict_schedule_main()
 {

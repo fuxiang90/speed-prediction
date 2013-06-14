@@ -103,4 +103,7 @@ void predict_schedule_main();
 
 void predict_test(LocRoad * loc_road_arr);
 
+
+void predict_check(LocRoad * loc_road_arr);
+
 #endif // PREDICTION_H_INCLUDED

@@ -57,7 +57,7 @@ void get_loc_from_file( LocRoad * loc_road_arr)
         locid_hash[locid] = i;
         loc_road_arr[i].locid =locid;
         loc_road_arr[i].pre_locid = pre_locid;
-
+        loc_road_arr[i].flag = 1;
         //2013年6月8日
         loc_road_arr_node_malloc(&loc_road_arr[i]);
         for(int j = 0 ; j < 7 ; j ++){
