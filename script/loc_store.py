@@ -13,6 +13,38 @@ class LocRoad(object):
         l = [0.0 for i in range(7*n) ]
         
         return l 
+    def get_history_speed(self,)
+class RealRoadSpeed(object):
+    """
+      当前时间段loc 道路的实时速度
+    """
+
+    def __init__(self):
+        self.year = 2013
+        self.mouth = 5
+        self.day = 12
+        self.weekday = 4
+        self.h = 12
+        self.m = 12
+
+        self.loc_speed = {}
+        
+    
+    def get_now_speed(self,seq):
+        pass
+    def predict_speed(self,time_step):
+        
+        now_time = self.h* 60 + self.m
+        pos = now_time/4
+        
+        speed = [0.0 for i in range(5) ]
+        speed[0] = 1
+        speed[1] = self.get_now_speed(roadid)
+
+        pass 
+
+
+    
 
 def get_loc_from_file(file_name):
     fin = open(file_name)
@@ -24,6 +56,7 @@ def get_loc_from_file(file_name):
     line_num = len(lines)
     pos = 0 
     print line_num 
+    loc_dict = {}
     while pos < line_num :
         
         line = lines[pos]
@@ -48,7 +81,12 @@ def get_loc_from_file(file_name):
                 loc.weight[(i - pos) * 5  + j ] = float(weight) 
                 j += 1
         pos += 7 
+        
+        loc_dict[locid] = loc 
     
+    for each in loc_dict:
+        print loc_dict[each].locid
+    return loc_dict
 
 
 if __name__ == "__main__":
