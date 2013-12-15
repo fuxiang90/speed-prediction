@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import mlpy
 import sys
+import math
 def get_input(filename):
     fin = open(filename)
     
@@ -56,12 +57,15 @@ def ridge_main():
     ridge.learn(x, y)
     test_x ,test_y = get_input('test')
     right_num = 0
+    mae = 0.0
     for pos  in range(0,len(test_x)):
         yy = ridge.pred(test_x[pos])
-        print yy ,test_y[pos]
+        #print yy ,test_y[pos]
         if abs(yy - test_y[pos]) < 5.0 :
             right_num +=1
-    print right_num*1.0 / len(test_x)  
+
+        mae += math.sqrt( (yy-test_y[pos]) ** 2 )
+    print right_num*1.0 / len(test_x), mae/len(test_x)
  
 def lars_base_main():
     x,y = get_input('train')
@@ -71,7 +75,7 @@ def lars_base_main():
     right_num = 0
     for pos  in range(0,len(test_x)):
         yy = lars.pred(test_x[pos])
-        print yy ,test_y[pos]
+        #print yy ,test_y[pos]
         if abs(yy - test_y[pos]) < 5.0 :
             right_num +=1
     print right_num*1.0 / len(test_x)  
@@ -82,17 +86,32 @@ def main():
     beta =  mlpy_linear_regressiono(x,y)
     test_x ,test_y = get_input('test')
     right_num = 0
+    mae = 0.0
     for pos in range(0,len(test_x)):
         pre_y = test_x[pos][0] * beta[0] + test_x[pos][1] * beta[1] + test_x[pos][2] * beta[2] + test_x[pos][3] * beta[3]
         
-        print pre_y , y[pos]
+        #print pre_y , y[pos]
+        
         if abs(pre_y - y[pos]) < 5.0:
             right_num += 1
+        
+        mae +=  math.fabs(pre_y-y[pos] )
     
-    print right_num*1.0 / len(test_x)     
+    print right_num*1.0 / len(test_x) ,mae/len(test_x)     
+
+def test_main():
+    files = ['2111_data' , '22520_data' ,'3860_data','390_data','620_data']
+
+    for file_name in files:
+        name = file_name[:file_name.find('_')]
+        print "roadid :" , name
+        split(file_name)
+        #ridge_main()
+        main()
 if __name__ =='__main__':
     
     #split('2111_data')
-    ridge_main()
+    #ridge_main()
+    test_main() 
     #main()
     #lars_base_main()
