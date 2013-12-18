@@ -8,11 +8,13 @@ class ShortPath(object):
 
     def __init__(self,road_file):
         self._road_file = road_file 
-        self._g = nx.DiGraph()
+        self._g = nx.Graph()
         self._roadnode_seq_dict = dict()
         self._seq_roadnode_dict = dict()
     def init(self):
         
+        for i in range(1,12):
+            self._g.add_node(i)
         for line in open(self._road_file):
             line_list = line.strip().split(' ')
             
@@ -25,8 +27,8 @@ class ShortPath(object):
                 self._roadnode_seq_dict[roadnode]  =  seq 
 
             if seq not in self._seq_roadnode_dict :
-                self._seq_roadnode_dict[seq]  = roadnode
-
+                self._seq_roadnode_dict[seq] = roadnode
+            
             self._g.add_edge(int(line_list[1]), int(line_list[2]), length=float(line_list[3]) )
     def update_length(self):
         """
@@ -47,13 +49,15 @@ class ShortPath(object):
     def show(self):
         
         G = self._g
-        nx.draw(self._g)
-        
+        #pos = nx.circular_layout(G) 
         pos=nx.spring_layout(G) # positions for all nodes 
-        nx.draw_networkx_nodes(G,pos,node_size=80)
-        nx.draw_networkx_edges(G,pos,edge_color='r') 
+        
+        pos = {1:(100,100),2:(200,100),3:(200,200),4:(300,200),8:(400,200),5:(300,100),9:(400,100),11:(500,100),7:(300,50),10:(400,50),6:(200,50)}
+        nx.draw(G,pos) 
+        #nx.draw_networkx_nodes(G,pos,node_size=80)
+        #nx.draw_networkx_edges(G,pos,edge_color='r') 
         #nx.draw(G,pos=nx.spring_layout(G))
-        plt.axis('off')
+        #plt.axis('off')
         plt.show()
 
     def test(self):
@@ -91,7 +95,7 @@ if __name__ == "__main__":
 
     test.init()
     
-    test.show() ;  
+    #test.show() ;  
     test.test2()
     #69047 69114
     """
