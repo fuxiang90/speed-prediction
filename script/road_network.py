@@ -39,7 +39,7 @@ class ShortPath(object):
         except :
             print "have no path"
             path = []
-        print path
+        return path
         
         #paths = nx.get_all_shortest_paths(self._g,start, end) 
         #print paths 
@@ -49,8 +49,10 @@ class ShortPath(object):
         G = self._g
         nx.draw(self._g)
         
-        #pos=nx.spring_layout(G) # positions for all nodes 
-        nx.draw(G,pos=nx.spring_layout(G))
+        pos=nx.spring_layout(G) # positions for all nodes 
+        nx.draw_networkx_nodes(G,pos,node_size=80)
+        nx.draw_networkx_edges(G,pos,edge_color='r') 
+        #nx.draw(G,pos=nx.spring_layout(G))
         plt.axis('off')
         plt.show()
 
@@ -59,6 +61,26 @@ class ShortPath(object):
             line = raw_input()
             l = line.strip().split(' ')
             self.short_path(int(l[0]), int(l[1]) ) 
+    
+    def test2(self):
+        path = self.short_path(1,11)
+        
+        print path 
+        #print "->".join(path) 
+
+
+        self._g[2][5]['length'] = 12222222222.0
+
+        path = self.short_path(1,11)
+        print path 
+        
+        #print "->".join(path)
+        self._g[2][5]['length'] = 3372.0
+
+        self._g[7][9]['length'] = 1222222222.0
+        
+        path = self.short_path(1,11)
+        print path 
 
 if __name__ == "__main__":
 
@@ -69,11 +91,14 @@ if __name__ == "__main__":
 
     test.init()
     
+    test.show() ;  
+    test.test2()
     #69047 69114
+    """
     test.short_path(1,11)
     test._g[2][5]['length'] = 12222222222.0
     test.short_path(1,11)
-
+    """
     #test.show()
 
     #test.test()

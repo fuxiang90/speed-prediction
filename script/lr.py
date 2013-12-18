@@ -6,6 +6,8 @@ import numpy as np
 import mlpy
 import sys
 import math
+
+
 def get_input(filename):
     fin = open(filename)
     
