@@ -27,9 +27,10 @@ class LocTrain(object):
         self.x_weekday = dict()
         self.y_weekday = dict()
         #self.x ,self.y = 
-        self.get_input(self.file_name)
         
     def train(self):
+        self.get_input(self.file_name)
+        
         print len(self.lrs)
         for weekday in range(7):
             self.lrs[weekday].learn(self.x_weekday[weekday], self.y_weekday[weekday]) 

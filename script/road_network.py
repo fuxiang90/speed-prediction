@@ -29,7 +29,14 @@ class ShortPath(object):
             if seq not in self._seq_roadnode_dict :
                 self._seq_roadnode_dict[seq] = roadnode
             
+            
+            self._g.add_edge(int(line_list[1]), int(line_list[2]), weight=float(line_list[3]) )
             self._g.add_edge(int(line_list[1]), int(line_list[2]), length=float(line_list[3]) )
+    
+    def compute_weigth(self,roadid):
+
+        pass 
+    
     def update_length(self):
         """
         更新权重 
@@ -37,7 +44,7 @@ class ShortPath(object):
     def short_path(self, start,end):
         path = []
         try:
-            path = nx.shortest_path(self._g , start ,end,weight='length')    
+            path = nx.shortest_path(self._g , start ,end,weight='weight')    
         except :
             print "have no path"
             path = []
@@ -73,18 +80,20 @@ class ShortPath(object):
         #print "->".join(path) 
 
 
-        self._g[2][5]['length'] = 12222222222.0
+        self._g[2][5]['weight'] = 12222222222.0
 
         path = self.short_path(1,11)
         print path 
         
         #print "->".join(path)
-        self._g[2][5]['length'] = 3372.0
+        self._g[2][5]['weight'] = 3372.0
 
-        self._g[7][9]['length'] = 1222222222.0
+        self._g[7][9]['weight'] = 1222222222.0
         
         path = self.short_path(1,11)
-        print path 
+        print path
+
+        print self._g.edges()[0]
 
 if __name__ == "__main__":
 
