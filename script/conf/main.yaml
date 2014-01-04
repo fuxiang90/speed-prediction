@@ -1,0 +1,4 @@
+
+roadid: { 1: 22520,2: 22520,3: 22520,4: 22520,5: 22520,6: 22520,7: 22520,8: 22520,9: 22520,10: 22520,11: 22520,12: 22520,13: 22520,14: 22520,15: 22520 }
+network_file: /home/fuxiang/speed-prediction/data/map_txt/nav-roadid-demo.txt
+loc_pre_file: /home/fuxiang/speed-prediction/data/map_txt/locid-seq-demo.txt
