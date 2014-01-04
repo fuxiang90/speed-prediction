@@ -61,7 +61,7 @@ class Manager(object):
             file_name = os.path.join(csv_root , str(locid)+'.csv')
             self._real_road_object[id] = LocRealRoad(file_name)
 
-            self._history_road_object = LocHistoryRoad(file_name) 
+            self._history_road_object[id] = LocHistoryRoad(file_name) 
 
     def set_pre_road(self, loc_pre_file_path):
         f = open(loc_pre_file_path) 
@@ -77,6 +77,15 @@ class Manager(object):
         """
             取得每条道路的实时速度，和预测的速度 ，预测28min后的 
         """
+        road_len = len(self._network._g.edges() )
+        
+        #这里的roadid 以0开始 ，路网中的是1 开始
+        for road_id in range(road_len) :
+            
+            now_speed = self._real_road_object[road_id+1].get_speed(year_tuple,h,m)
+            first_pre_speed , pre_speed = self.get_predict_road_speed(year_tuple,h,m,road_id+1)
+            speed_list = [now_speed,first_pre_speed, pre_speed]
+            self._network.update_weight(road_id,speed_list) 
 
     def get_real_road_speed(self,year_tuple,h,m):
         real_road_speed_dict = {}
@@ -94,11 +103,42 @@ class Manager(object):
             history_road_speed_dict [id] = speed
 
         return history_road_speed_dict
-    def get_predict_road_speed(self,year,h,m):
+    def get_predict_road_speed(self,year,h,m,road_id,time_pre = 28):
+        
 
         
+        pre_road_id = self._pre_road.get(road_id, road_id)
+        real_speed = self.get_real_road_speed(year,h,m)
+        now_road_id_speed = real_speed[road_id]
+        now_pre_road_id_speed = real_speed[pre_road_id]
+        
+        
+        
+
+        for i in range(time_pre/4 - 1):
+            #history_speed = self.get_history_road_speed(year,h,m)
+            history_road_id_speed = self._history_road_object[road_id].get_speed(year,h,m)
+            history_pre_road_id_speed = self._history_road_object[pre_road_id].get_speed(year,h,m)
             
-    def run():
+            speeds = [1, now_road_id_speed,now_pre_road_id_speed, history_road_id_speed,history_pre_road_id_speed]
+
+            
+            now_road_id_speed = self._lr_mode[road_id].predict(1,speeds)
+            if i == 0: 
+                first_pre_speed = now_road_id_speed
+            m += 4
+            if m >= 60:
+                h += 1 
+                m %= 60 
+        return first_pre_speed,now_road_id_speed 
+
+    
+    def get_lr_mode(self):
+        for id in self._lr_mode :
+            self._lr_mode[id].train() 
+
+            
+    def run(self):
         
         """
         1. 从某个时间开始
@@ -106,23 +146,63 @@ class Manager(object):
         3. 模拟车辆的位置，是否通过了这条道路
         4. 不断计算车辆到最终点的路径
         """
-        
-        for id in self._lr_mode :
-            self._lr_mode[id].train() 
+        self.get_lr_mode()
 
-        start_year = 2013
-        start_mou = 6
-        start_day = 12
+        start_year = 2012
+        start_mou = 11
+        start_day = 26
         
-        start_h = 12
-        start_min = 0
-        min_step = 4
+        start_h = 17
+        start_m = 00
+        
+        min_step = 00
 
         start_pos = 1
         end_pos = 11 
+        
+        now_pass_len = 0
 
-        for i in range(10):
+        year_tuple = (start_year,start_mou,start_day)
 
+        print "run is begin "
+        print self._network._g.edges() 
+        for i in range(100):
+            path = self._network.short_path(start_pos,end_pos)
+            
+            if len(path) == 2 and now_pass_len > self._network.get_road_id_length(start_pos,end_pos): break
+            
+            next_node = path[1] 
+            
+            pos = 1 
+            while pos < len(path) and pos +1 < len(path) and  now_pass_len > self._network.get_road_id_length(start_pos,next_node ):
+                now_pass_len -= self._network.get_road_id_length(start_pos,next_node )  
+                start_pos = path[pos]
+                next_node = path[pos+1] 
+                pos += 1 
+
+            road_id = self._network.get_road_id(start_pos,next_node) + 1
+            now_speed = self._real_road_object[road_id].get_speed( year_tuple, start_h,start_m)
+
+            
+            self.update_weight(year_tuple,start_h,start_m) 
+            now_pass_len += now_speed * 4.0/60 * 1000  ;
+            start_m += 4 
+            if start_m >= 60 :
+                start_m %= 60 
+                start_m += 1 
+            print "===============================",i 
+            print "现在是%d:%d ,车辆在道路road<%d,%d> ,道路的速度是%f "%(start_h,start_m,start_pos,next_node,now_speed)  
+            print "现在到终点的路径是" ,path[pos:]   
+            
+            
 
 if __name__ == '__main__':
     t = Manager('./conf/main.yaml')
+    
+
+    """
+    t.get_lr_mode() 
+    print t.get_predict_road_speed((2012,12,26),17,0,2)
+    """ 
+
+    t.run()

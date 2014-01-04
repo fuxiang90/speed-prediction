@@ -31,12 +31,13 @@ class LocTrain(object):
     def train(self):
         self.get_input(self.file_name)
         
-        print len(self.lrs)
         for weekday in range(7):
             self.lrs[weekday].learn(self.x_weekday[weekday], self.y_weekday[weekday]) 
         
-        for weekday in range(7):
-            print self.lrs[weekday].beta()
+    def predict(self,weekday,speeds):
+        
+        pre_speed = self.lrs[weekday].pred(speeds)
+        return pre_speed 
     def test(self):
         pass 
     
@@ -58,7 +59,6 @@ class LocTrain(object):
             
             weekday = int(l[5])
             if weekday not  in self.x_weekday:
-                print weekday
                 self.x_weekday[weekday] = []
                 self.y_weekday[weekday] = []
             self.x_weekday[weekday].append(each_x)
@@ -69,7 +69,8 @@ def main():
 
     tmp = LocTrain('../data/train/3860_data',"ridge")
     tmp.train() 
-
+    
+    print tmp.predict(1,[1,10,10,20,10])
     pass 
 
 if __name__ == '__main__':

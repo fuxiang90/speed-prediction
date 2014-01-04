@@ -11,6 +11,9 @@ class ShortPath(object):
         self._g = nx.Graph()
         self._roadnode_seq_dict = dict()
         self._seq_roadnode_dict = dict()
+        
+        self._log = open(__name__,"w")
+        self.init()
     def init(self):
         
         for i in range(1,12):
@@ -32,15 +35,40 @@ class ShortPath(object):
             
             self._g.add_edge(int(line_list[1]), int(line_list[2]), weight=float(line_list[3]) )
             self._g.add_edge(int(line_list[1]), int(line_list[2]), length=float(line_list[3]) )
+            self._g.add_edge(int(line_list[1]), int(line_list[2]), id=seq )
     
-    def compute_weigth(self,roadid):
+    def compute_weight(self,speeds):
+        
+        avg_speed = 20
 
-        pass 
-    
-    def update_length(self):
+        weight = 1.0 
+        now_speed = speeds[0]
+        first_pre_speed = speeds[1]
+        pre_speed = speeds[2]
+        
+        weight += (20-now_speed)/10 ;
+        weight += (20-first_pre_speed)/10;
+        weight += (20-pre_speed)/10;
+        if pre_speed <= 5:
+            weight += 2.0 
+        return weight  
+    def update_weight(self,road_id,speeds):
         """
         更新权重 
         """
+
+        weight  = self.compute_weight(speeds)
+        
+        node_tuple = self._g.edges()[road_id -1]
+        s = node_tuple[0] 
+        e = node_tuple[1]
+        """ 
+        if s == 5 and e == 9 :
+            weight = 20
+        """
+        self._g[s][e]['weight'] = weight* self._g[s][e]['length']
+
+        self._log.write( str(self._g[s][e]['weight']) + str(self._g[s][e]['length']) + '\n' ) 
     def short_path(self, start,end):
         path = []
         try:
@@ -52,7 +80,18 @@ class ShortPath(object):
         
         #paths = nx.get_all_shortest_paths(self._g,start, end) 
         #print paths 
-     
+    def get_road_id(self,start,end):
+        try:
+            return self._g[start][end]['id']
+        except:
+            print ">>>   worng input "
+            return -1
+    def get_road_id_length(self,start,end):
+        try:
+            return self._g[start][end]['length']
+        except:
+            print ">>>   wrong input "
+            return -1 
     def show(self):
         
         G = self._g
@@ -92,8 +131,11 @@ class ShortPath(object):
         
         path = self.short_path(1,11)
         print path
+        
+        print self._g[1][2]['id']
+        print self._g.edges()[15]
 
-        print self._g.edges()[0]
+        self.update_weight(2,[10,10,10])
 
 if __name__ == "__main__":
 
